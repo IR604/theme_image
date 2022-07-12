@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title><%=title %></title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    
+    <div class="boxC">
+        <div class="boxB">
+            <div class="boxB-1">
+                <a href=<%-themelink%>>
+                    <div class="box3">
+                        <%-theme%>
+                    </div>
+                </a>
+                <div class="box4">
+                    イラスト
+                </div>
+                <div class="box5">
+                    <div class="box5-1">
+                        <%-title%>
+                    </div>
+                    <div class="box5-2">
+                        <span class="material-symbols-outlined">grade</span><%-like%>　<span class="material-symbols-outlined">ios_share</span>
+                    </div>
+                    <div class="box5-4">
+                        <ul>
+                            <li><a href="/research?search=タグ">タグ</a></li>
+                            <li><a href="/research?search=タグ">タグ</a></li>
+                        </ul>
+                    </div>
+                    <div class="box5-3">
+                        <%-gaiyou%>
+                    </div>
+                    <div class="box5-5">
+                        <div class="box5-icon">
+                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="70" height="70">
+                        </div>
+                        <div class="box5-name">
+                            <a href=<%-akauntolink%>><%-name%></a>
+                        </div>
+                        <div class="box5-follow">
+                            <a href="#">Forrow</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="box6">
+                    <div class="box6-1">
+                        <strong>Comment<strong><br>
+                        <input type="text" name="name"><input type="button" value="投稿" id="button2">
+                    </div>
+                    <div class="box6-2">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="boxB-2">
+                <div class="box7">
+                    同テーマのイラスト
+                </div>
+                <div class="box8">
+                    一覧
+                </div>
+            </div>
+        </div>
+        <div class="box9">
+            <div class="box9-1">
+                関連イラスト
+            </div>
+            <div class="box9-2">
+                一覧
+            </div>
+        </div>
+    </div>
+    <div class="box10">
+        コピーライト
+    </div>
+</body>
+</html>

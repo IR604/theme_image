@@ -1,0 +1,197 @@
+@charset "UTF-8";
+
+
+body	{margin: 0;
+	font-family: 'メイリオ', 'Hiragino Kaku Gothic Pro', sans-serif}
+
+.boxA::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.boxB::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.boxC::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.box-nf::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.box3::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+span{
+    color:#727272;
+}
+
+.header1	{float: left;
+    width: 20%;
+}
+.header1-1	{float: left;
+    width: 50%;
+}
+.header2	{float: left;
+    text-align:center;
+    width: 60%;
+}
+.header3	{float: right;
+    text-align:right;
+    width: 20%;
+}
+
+.menu{position: absolute;
+    top: 56px;
+    background-color: #ffffff;
+    width: 300px;
+    height: 100%;
+}
+
+summary.menuber{
+    padding: 2px;
+    font-weight: bold;
+    border: solid 2px black;
+    cursor :pointer;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+}
+
+.boxA {
+    background-color: #ffee8f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.boxB {
+    padding-bottom: auto;
+}
+
+.boxC {
+    margin: 8px;
+    margin-top: 0px;
+}
+.boxB-1	{float: left;
+    width: 100%;
+}
+
+#avatar{
+    border-radius:50%;
+}
+
+/* ナビゲーション */
+.ber ul	{margin: 0;
+	padding: 0;
+	list-style: none}
+.ber li a	{display: block;
+	color: #8a8a8a;
+	font-size: 30px;
+    text-decoration: none;
+    padding-left: 10px;
+    padding-right: 10px;}
+.ber li a:hover	{background-color: #dddddd}
+.ber ul:after	{content: "";
+	display: block;
+	clear: both}
+.ber li	{float: left;
+    height:100%;
+    width:auto}
+
+.box1{
+    height: 210px;
+    width: 100%;
+    background-color: #8a8a8a
+}
+.box2{
+    height: 200px;
+    width: 100%;
+    background-color: #ffffff;
+}
+.box2-1 {position: absolute;
+    top: 200px;
+    left: 40px;
+    background-color: #c4c4c4;
+    border-radius:50%;
+    width: 150px;
+    height: 150px;
+}
+.box2-2 {float: right;
+    width: 85%;
+    height: 100%;
+}
+.box-name{float:left;
+    width:auto;
+    height:auto;
+    font-size: 30px;
+    font-weight: bold;
+}
+.box-follower{float:left;
+    width:auto;
+    height:auto;
+    margin-left: 10px;
+    font-size: 20px;
+}
+.box-follow{float:right;
+    padding-right: 20px;
+    width:100px;
+    height:45px;
+    font-size: 30px;
+    border-radius: 20%;
+    font-weight: bold;
+    background-color: #ffee8f;
+}
+.box-gaiyou{
+    width:100%;
+    height:150px;
+    color: #727272;
+}
+
+.box3{text-align: center;
+    height: 45px;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: solid 1px #dddddd;
+}
+.box4{
+    height: 200px;
+    width: 100%;
+    background-color: #ffffff;
+}
+.box5{
+    height: 250px;
+    width: 100%;
+    background-color: #ffffff;
+}
+.box9{
+    height: 150px;
+    width: 100%;
+    color: #727272;
+    background-color: #e6e6e6;
+}
+
+.search_bar{
+    display: flex; /*アイコン、テキストボックスを調整する*/
+    align-items: center; /*アイコン、テキストボックスを縦方向の中心に*/
+    justify-content: center; /*アイコン、テキストボックスを横方向の中心に*/
+    height: 50px;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    background-color: #ddd;
+}
+
+#text2{
+    font-size: 16px;
+    width: 100%; /*flexの中で100%広げる*/
+    background-color: #ddd;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+    box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+}

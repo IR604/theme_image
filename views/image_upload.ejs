@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>イラストアップロード</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/image_upload.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    
+    <div class="boxC">
+        <div class="boxB">
+            <div class="box1">
+                <%-themename.contents%>
+            </div>
+            <form action="/imageupload" method="post">
+                <input type="hidden" name="id" value="<%= themeid %>">
+                <div class="box2">
+                    <div class="image">
+                        イラスト
+                    </div>
+                    <div class="image">
+                        イラスト
+                    </div>
+                    <input type="file" name="file"  accept="image/*">
+                </div>
+                
+                <div class="box3">
+                    <div class="ber">
+                        タイトル
+                    </div>
+                    <input type="text" name="title">
+                </div>
+                <div class="box3">
+                    <div class="ber">
+                        概要
+                    </div>
+                    <textarea name="gaiyou" class="theme"></textarea>
+                </div>
+                <div class="box4">
+                    <input type="submit" value="投稿">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box9">
+        コピーライト
+    </div>
+</body>
+</html>

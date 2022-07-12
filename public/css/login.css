@@ -1,0 +1,47 @@
+.boxA{
+    margin: 25px;
+    width: 95%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+.boxA::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.box1-0{
+    height: 10%;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 30px;
+    background-color: #ffee8f;
+    border: 1px solid #999;
+}
+.box1-1{
+    height: 90%;
+    border: 1px solid #999;
+    background-color: #ffffff;
+}
+.box1-1-1{float:left;
+    height: 100%;
+    width: 50%;
+}
+.box1-1-2{
+    padding: 10px;
+}
+.box1-1-3{
+    padding: 10px;
+    background-color: #dd4b39;
+    color: #ffffff;
+}
+.share a:hover   {opacity: 0.8}
+.share a{
+    text-decoration: none;
+}
+
+p {
+    /* 水平方向の中央揃え */
+    margin-top: 0px;
+    text-align: center;
+  }

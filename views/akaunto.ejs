@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title><%-akauntoinfo.name%></title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/akaunto.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    
+    <div class="box1">
+    </div>
+    <div class="boxC">
+        <div class="box2">
+            <div class="box2-1">
+                <img src="images/icons/<%-akauntoinfo.item_id%>.jpg" id="avatar" alt=""  width="150" height="150">
+            </div>
+            <div class="box2-2">
+                <div class="box-nf">
+                    <div class="box-name"><%-akauntoinfo.name%></div>
+                    <div class="box-follower">フォロー：<%-akauntoinfo.follow%>　フォロワー：<%-akauntoinfo.follower%></div>
+                    <div class="box-follow">
+                        <a href="#">Forrow</a>
+                    </div>
+                </div>
+                <div class="box-gaiyou"><%-akauntoinfo.summary%></div>
+            </div>
+        </div>
+        <div class="boxB">
+            <div class="box3">
+                <nav class="ber">
+                    <ul>
+                    <li><a href="#">テーマ</a></li>
+                    <li><a href="#">イラスト</a></li>
+                    <li><a href="#">作成したリスト</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="box4">
+                投稿一覧
+            </div>
+        </div>
+    </div>
+    <div class="box9">
+        コピーライト
+    </div>
+</body>
+</html>

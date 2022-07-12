@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>テーマアップロード</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/upload.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    <div class="boxC">
+        <div class="boxB">
+            <form action="/themeupload" method="post">
+                <div class="box1">
+                    <div class=ber>
+                        テーマ
+                    </div>
+                    <textarea name="theme" class="theme"
+                    value="<%=form.theme %>"></textarea>
+                    <font color="red"><%-error%></font>
+                </div>
+                <div class="box2">
+                    <div class=ber>
+                        タグ
+                    </div>
+                    <input type="text" name="tag">
+                </div>
+                <div class="box3">
+                    <input type="submit" value="投稿">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box9">
+        コピーライト
+    </div>
+</body>
+</html>

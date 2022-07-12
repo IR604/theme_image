@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title><%-themeinfo.contents%></title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/theme_page.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    
+    <div class="boxC">
+        <div class="box1">
+            <%-themeinfo.contents%>
+        </div>
+        <div class="box4">
+            <form action="/imageupload" method="get">
+                <input type="hidden" name="id" value="<%= themeinfo.item_id %>">
+                <input type="submit" value="このテーマで投稿">
+            </form>
+        </div>
+        <div class="box2">
+            <ul>
+                <% for(var i in tag) { %>
+                    <li><a href="/research?search=<%- tag[i] %>"><%= tag[i] %></a></li>
+                <% } %>
+            </ul>
+        </div>
+        <div class="box5-5">
+            <div class="box5-icon">
+                <img src="images/icons/icon.png"  id="avatar" alt=""  width="70" height="70">
+            </div>
+            <div class="box5-name">
+                <a href="us<%-themeinfo.account_id%>"><%-name%></a>
+            </div>
+            <div class="box5-follow">
+                <a href="#">Forrow</a>
+            </div>
+        </div>
+        <div class="box3">
+            <div class="box3-1">
+                イラスト
+            </div>
+            <div class="box3-3">
+                一覧
+            </div>
+        </div>
+        <div class="box3">
+            <div class="box3-1">
+                関連テーマ
+            </div>
+            <div class="box3-2">
+                一覧
+            </div>
+        </div>
+    </div>
+    <div class="box10">
+        コピーライト
+    </div>
+</body>
+</html>

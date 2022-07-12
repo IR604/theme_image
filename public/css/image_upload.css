@@ -1,0 +1,146 @@
+@charset "UTF-8";
+
+
+body	{margin: 0;
+	font-family: 'メイリオ', 'Hiragino Kaku Gothic Pro', sans-serif}
+
+.boxA::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.boxB::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.boxC::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+span{
+    color:#727272;
+}
+
+.header1	{float: left;
+    width: 20%;
+}
+.header1-1	{float: left;
+    width: 50%;
+}
+.header2	{float: left;
+    text-align:center;
+    width: 60%;
+}
+.header3	{float: right;
+    text-align:right;
+    width: 20%;
+}
+
+.ber{
+    width:100%;
+    padding-top:10px;
+    padding-bottom:10px;
+    border-bottom: solid 1px #dddddd;
+}
+
+.menu{position: absolute;
+    top: 56px;
+    background-color: #ffffff;
+    width: 300px;
+    height: 100%;
+}
+
+summary.menuber{
+    padding: 2px;
+    font-weight: bold;
+    border: solid 2px black;
+    cursor :pointer;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+}
+
+.boxA {
+    background-color: #ffee8f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.boxB {
+    padding-bottom: auto;
+}
+.boxB-1	{float: left;
+    width: 100%;
+}
+
+.boxC {
+    margin: 8px;
+}
+
+.theme{
+    display: inline-block;
+    width: 700px;
+    max-width: 100%;
+    height: 400px;
+    max-height: 100%;
+    padding: 0.5em;
+    border: 1px solid #999;
+    box-sizing: border-box;
+    margin: 0.5em 0;
+}
+
+#avatar{
+    border-radius:50%;
+}
+.image{
+    float: left;
+    margin-top: 4px;
+    margin-left: 4px;
+    width:300px;
+    height:190px;
+    font-weight: bold;
+    background-color: #999999;
+}
+
+.box1{
+    width:100%;
+    height:170px;
+    font-weight: bold;
+    border: solid 3px #000000;
+}
+
+.box2{
+    width:100%;
+    height:200px;
+    font-weight: bold;
+    background-color: #000000;
+}
+
+.box9{
+    height: 150px;
+    width: 100%;
+    color: #727272;
+    background-color: #e6e6e6;
+}
+
+.search_bar{
+    display: flex; /*アイコン、テキストボックスを調整する*/
+    align-items: center; /*アイコン、テキストボックスを縦方向の中心に*/
+    justify-content: center; /*アイコン、テキストボックスを横方向の中心に*/
+    height: 50px;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    background-color: #ddd;
+}
+
+#text2{
+    font-size: 16px;
+    width: 100%; /*flexの中で100%広げる*/
+    background-color: #ddd;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+    box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+}

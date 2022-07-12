@@ -1,0 +1,78 @@
+@charset "UTF-8";
+
+
+body	{margin: 0;
+	font-family: 'メイリオ', 'Hiragino Kaku Gothic Pro', sans-serif}
+
+.boxA::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+span{
+    color:#727272;
+}
+
+.header1	{float: left;
+    width: 20%;
+}
+.header1-1	{float: left;
+    width: 50%;
+}
+.header2	{float: left;
+    text-align:center;
+    width: 60%;
+}
+.header3	{float: right;
+    text-align:right;
+    width: 20%;
+}
+
+.menu{position: absolute;
+    top: 56px;
+    background-color: #ffffff;
+    width: 300px;
+    height: 100%;
+}
+
+summary.menuber{
+    padding: 2px;
+    font-weight: bold;
+    border: solid 2px black;
+    cursor :pointer;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+}
+
+.boxA {
+    background-color: #ffee8f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.main{
+    width:100%;
+    display: flex;
+    justify-content: center;
+}
+
+.search_bar{
+    display: flex; /*アイコン、テキストボックスを調整する*/
+    align-items: center; /*アイコン、テキストボックスを縦方向の中心に*/
+    justify-content: center; /*アイコン、テキストボックスを横方向の中心に*/
+    height: 50px;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    background-color: #ddd;
+}
+
+#text2{
+    font-size: 16px;
+    width: 100%; /*flexの中で100%広げる*/
+    background-color: #ddd;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+    box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+}
