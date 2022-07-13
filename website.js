@@ -159,11 +159,24 @@ app.get("/imageupload", (req, res) => {
 // researchページ
 app.get("/research", (req, res) => {
     var word = req.query.search;
-    res.render('research.ejs',
-    {
-        title: 'イラストページ',
-        search: word
+    var title = word + 'の検索結果'
+    var name = 'ir604'
+    
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();    
+    connection.query('SELECT * from theme where tag like ? ','%'+word+'%' ,function (error, results, fields){
+        if (error == null){
+            res.render('research.ejs',
+            {
+                title: title,
+                search: word,
+                name:name,
+                themeinfo: results
+            });
+        }
     });
+    connection.end();
 });
 
 // テーマアップロード処理

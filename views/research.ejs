@@ -28,7 +28,25 @@
                 見つかったテーマ
             </div>
             <div class="box3">
-                一覧
+                <% for(var i in themeinfo) { %>
+                    <div class="theme_ichiran">
+                        <a href="/tm<%=themeinfo[i].item_id%>">
+                            <div class="theme_top">
+                                <%=themeinfo[i].contents%>
+                            </div>
+                        </a>
+                        <a href="us<%-themeinfo[i].account_id%>">
+                            <div class="theme_bottom">
+                                <div class="theme_icon">
+                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </div>
+                                <div class="theme_name">
+                                    <%-name%>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
             </div>
         </div>
 
