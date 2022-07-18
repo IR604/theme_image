@@ -7,16 +7,19 @@ app.engine('ejs',ejs.renderFile);
 app.use(express.static('public'));
 
 var multer = require('multer');
-var item_id;
+var filename;
+var account_id=1;
 var storage = multer.diskStorage({
-  //ファイルの保存先を指定
-  destination: function(req, file, cb){
-    cb(null, './public/images/')
-  },
-  //ファイル名を指定
-  filename: function(req, file, cb){
-    cb(null, 'image.jpg')
-  }
+    //ファイルの保存先を指定
+    destination: function(req, file, cb){
+        cb(null, './public/images/images')
+    },
+    //ファイル名を指定
+    filename: function(req, file, cb){
+        var original_name = file.originalname;
+        filename  =Date.now()+'_'+account_id+'.'+original_name.split('.').pop();
+        cb(null, filename)
+    }
 })
 
 var upload = multer({storage:storage})
@@ -137,9 +140,8 @@ app.get("/themeupload", (req, res) => {
 });
 // imageuploadページ
 app.get("/imageupload", (req, res) => {
-    var theme = 'テーマ'
     var themeid = req.query.id
-
+    
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();    
@@ -147,7 +149,6 @@ app.get("/imageupload", (req, res) => {
         if (error == null){
             res.render('image_upload.ejs',
             {
-                theme: theme,
                 themeid: themeid,
                 themename: results[0]
             });
@@ -215,10 +216,19 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 
 // イラストアップロード処理
 app.post('/imageupload',upload.single('file'),(req, res) => {
-    // var imagename = req.body.imagename;
     var title = req.body.title;
     var gaiyou = req.body.gaiyou;
-    res.redirect('/');
+    var theme_id = req.body.id;
+    var data = {'name':filename, 'title':title, 'likes':0, 'contents':gaiyou, 'theme_id':theme_id,  'account_id': account_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into image set ?', data, function (error, results, fields){
+        res.redirect('/');
+    });
+
+    connection.end();
 });
 
 var server = app.listen(3000, () => {
