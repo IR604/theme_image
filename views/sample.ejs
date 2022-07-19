@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title><%=title %></title>
+<title><%=imageinfo.title%></title>
 <meta name="viewport" content="width=device-width">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -15,29 +15,30 @@
     <div class="boxC">
         <div class="boxB">
             <div class="boxB-1">
-                <a href=<%-themelink%>>
+                <a href="tm<%-imageinfo.theme_id%>">
                     <div class="box3">
-                        <%-theme%>
+                        <%-imageinfo.contents%>
                     </div>
                 </a>
                 <div class="box4">
-                    イラスト
+                    <img src="images/images/<%-imageinfo.name%>">
                 </div>
                 <div class="box5">
                     <div class="box5-1">
-                        <%-title%>
+                        <%-imageinfo.title%>
                     </div>
                     <div class="box5-2">
-                        <span class="material-symbols-outlined">grade</span><%-like%>　<span class="material-symbols-outlined">ios_share</span>
+                        <span class="material-symbols-outlined">grade</span><%-imageinfo.likes%>　<span class="material-symbols-outlined">ios_share</span>
                     </div>
                     <div class="box5-4">
                         <ul>
-                            <li><a href="/research?search=タグ">タグ</a></li>
-                            <li><a href="/research?search=タグ">タグ</a></li>
+                            <% for(var i in tag) { %>
+                                <li><a href="/research?search=<%- tag[i] %>"><%= tag[i] %></a></li>
+                            <% } %>
                         </ul>
                     </div>
                     <div class="box5-3">
-                        <%-gaiyou%>
+                        <%-imageinfo.c1%>
                     </div>
                     <div class="box5-5">
                         <div class="box5-icon">

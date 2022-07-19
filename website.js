@@ -71,27 +71,36 @@ app.get("/login", (req, res) => {
 });
 
 // imageページ
-app.get("/image", (req, res) => {
+app.get("/im:imagelink", (req, res) => {
+    var imagelink = req.params.imagelink
     var msg = 'IR604'
-    var akauntolink = '/akaunto'
-    var themelink = '/theme'
-    res.render('sample.ejs',
-    {
-        title: 'イラストページ',
-        theme: 'テーマ',
-        gaiyou: '概要',
-        akauntolink: akauntolink,
-        themelink: themelink,
-        name: msg,
-        like: 0
+    var akauntolink = '/us1'
+
+    var connection = mysql.createConnection(mysql_setting);
+    
+    connection.connect();    
+    connection.query('SELECT *, image.contents as c1 from image INNER JOIN theme ON image.theme_id=theme.item_id where image.item_id=?',
+    imagelink ,function (error, results, fields){
+        if (error == null){
+            var tag = results[0].tag;
+            var tagArr = tag.split(',');
+            res.render('sample.ejs',
+            {
+                akauntolink: akauntolink,
+                name: msg,
+                imageinfo: results[0],
+                tag: tagArr
+            });
+        }
     });
+    connection.end();
 });
 
 // themeページ
 app.get("/tm:themelink", (req, res) => {
     var themelink = req.params.themelink
     var msg = 'IR604'
-    var akauntolink = '/akaunto'
+    var akauntolink = '/us1'
 
     var connection = mysql.createConnection(mysql_setting);
 
