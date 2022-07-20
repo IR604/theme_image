@@ -147,8 +147,8 @@ app.get("/themeupload", (req, res) => {
         form:{theme:''}
     });
 });
-// imageuploadページ
-app.get("/imageupload", (req, res) => {
+// illustuploadページ
+app.get("/illustupload", (req, res) => {
     var themeid = req.query.id
     
     var connection = mysql.createConnection(mysql_setting);
@@ -224,7 +224,7 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 });
 
 // イラストアップロード処理
-app.post('/imageupload',upload.single('file'),(req, res) => {
+app.post('/illustupload',upload.single('file'),(req, res) => {
     var title = req.body.title;
     var gaiyou = req.body.gaiyou;
     var theme_id = req.body.id;
