@@ -58,38 +58,27 @@
                         話題のイラスト
                     </div>
                     <div class="box3-3">
-                        <div class="image_ichiran">
-                            <a href=<%-imagelink%>>
-                                <div class="image_top">
-                                </div>
-                            </a>
-                            <a href=<%-akauntolink%>>
-                                <div class="theme_bottom">
-                                    <div class="theme_icon">
-                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                        <% for(var i in imageinfo) { %>
+                            <div class="image_ichiran">
+                                <a href="im<%-imageinfo[i].item_id%>">
+                                    <div class="image_top">
                                     </div>
-                                    <div class="theme_name">
-                                        <%-name%>
+                                    <div class="image_top2">
+                                        <%-imageinfo[i].title%>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="image_ichiran">
-                            <a href=<%-imagelink%>>
-                                <div class="image_top">
-                                </div>
-                            </a>
-                            <a href=<%-akauntolink%>>
-                                <div class="theme_bottom">
-                                    <div class="theme_icon">
-                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </a>
+                                <a href="us<%-imageinfo[i].account_id%>">
+                                    <div class="theme_bottom">
+                                        <div class="theme_icon">
+                                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                        </div>
+                                        <div class="theme_name">
+                                            <%-name%>
+                                        </div>
                                     </div>
-                                    <div class="theme_name">
-                                        <%-name%>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+                                </a>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             </div>

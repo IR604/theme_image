@@ -43,10 +43,16 @@ app.get("/", (req, res) => {
     var msg = 'IR604'
     var imagelink = '/image'
     var akauntolink = '/akaunto'
+    var imageinfo;
 
     var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();    
+    connection.connect();
+    connection.query('SELECT * from image',function (error, results, fields){
+        if (error == null){
+            imageinfo = results
+        }
+    });
     connection.query('SELECT * from theme',function (error, results, fields){
         if (error == null){
             res.render('index.ejs',
@@ -54,6 +60,7 @@ app.get("/", (req, res) => {
                 title: 'ホームページ',
                 name: msg,
                 themeinfo: results,
+                imageinfo: imageinfo,
                 imagelink: imagelink,
                 akauntolink: akauntolink
             });
