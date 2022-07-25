@@ -178,10 +178,16 @@ app.get("/research", (req, res) => {
     var word = req.query.search;
     var title = word + 'の検索結果'
     var name = 'ir604'
+    var imageinfo;
     
     var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();    
+    connection.connect();
+    connection.query('SELECT * from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
+        if (error == null){
+            imageinfo=results
+        }
+    });
     connection.query('SELECT * from theme where tag like ? ','%'+word+'%' ,function (error, results, fields){
         if (error == null){
             res.render('research.ejs',
@@ -189,7 +195,8 @@ app.get("/research", (req, res) => {
                 title: title,
                 search: word,
                 name:name,
-                themeinfo: results
+                themeinfo: results,
+                imageinfo: imageinfo
             });
         }
     });

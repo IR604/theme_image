@@ -78,6 +78,22 @@ span{
     font-weight: bold;
 }
 
+.image_ichiran{float: left;
+    width: 300px;
+    height: 100%;
+    margin-right: 5px;
+}
+
+.image_top{width: 100%;
+    height: 200px;
+    background-color: #777777;
+}
+.image_top2{width: 100%;
+    height: 25px;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
 summary.menuber{
     padding: 2px;
     font-weight: bold;
@@ -119,6 +135,12 @@ summary.menuber{
 
 .box3{
     height: 200px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.box4{
+    height: 270px;
     width: 100%;
     background-color: #ffffff;
 }
