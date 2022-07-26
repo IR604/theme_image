@@ -82,11 +82,17 @@ app.get("/im:imagelink", (req, res) => {
     var imagelink = req.params.imagelink
     var msg = 'IR604'
     var akauntolink = '/us1'
+    var comments;
 
     var connection = mysql.createConnection(mysql_setting);
     
-    connection.connect();    
-    connection.query('SELECT *, image.contents as c1 from image INNER JOIN theme ON image.theme_id=theme.item_id where image.item_id=?',
+    connection.connect(); 
+    connection.query('SELECT *, comment.summary as su1 FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=?',imagelink ,function (error, results, fields){
+        if (error == null){
+            comments=results;
+        }
+    });   
+    connection.query('SELECT *, image.contents as c1, image.item_id as id1 from image INNER JOIN theme ON image.theme_id=theme.item_id where image.item_id=?',
     imagelink ,function (error, results, fields){
         if (error == null){
             var tag = results[0].tag;
@@ -95,6 +101,7 @@ app.get("/im:imagelink", (req, res) => {
             {
                 akauntolink: akauntolink,
                 name: msg,
+                comments: comments,
                 imageinfo: results[0],
                 tag: tagArr
             });
@@ -224,7 +231,7 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
     } else {
         var theme = req.body.theme;
         var tag = req.body.tag;
-        var data = {'contents':theme, 'tag':tag, 'account_id': 5}
+        var data = {'contents':theme, 'tag':tag, 'account_id': account_id}
 
         var connection = mysql.createConnection(mysql_setting);
 
@@ -249,6 +256,23 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
     connection.connect();
     connection.query('insert into image set ?', data, function (error, results, fields){
         res.redirect('/');
+    });
+
+    connection.end();
+});
+
+// コメントアップロード処理
+app.post('/comment',(req, res) => {
+    var summary = req.body.comment;
+    var image_id = req.body.id;
+    var redirect_link = req.body.link;
+    var data = {'summary':summary, 'image_id':image_id, 'account_id': account_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into comment set ?', data, function (error, results, fields){
+        res.redirect(redirect_link);
     });
 
     connection.end();

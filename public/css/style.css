@@ -19,6 +19,11 @@ body	{margin: 0;
     display: block;
     clear: both;
 }
+.comment::after {
+    content: "";
+    display: block;
+    clear: both;
+}
 
 span{
     color:#727272;
@@ -54,6 +59,20 @@ summary.menuber{
     border: none; /*枠線非表示*/
     outline: none; /*フォーカス時の枠線非表示*/
 }
+
+/*コメント欄*/ 
+.comment{
+    margin:2px;
+    width:100%;
+    height:auto;
+    border-bottom: dotted 2px #dddddd;
+}
+.comment-icon{float: left;}
+.comment-left{
+    float: left;
+    margin-left:5px
+}
+.comment-contents{font-weight: normal;}
 
 .boxA {
     background-color: #ffee8f;

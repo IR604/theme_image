@@ -54,11 +54,31 @@
                 </div>
                 <div class="box6">
                     <div class="box6-1">
-                        <strong>Comment<strong><br>
-                        <input type="text" name="name"><input type="button" value="投稿" id="button2">
+                        <strong>Comment</strong>
+                        <br>
+                        <form action="/comment" method="post">
+                            <input type="text" name="comment">
+                            <input type="hidden" name="id" value="<%= imageinfo.id1%>">
+                            <input type="hidden" name="link" value="/im<%= imageinfo.id1%>">
+                            <input type="submit" value="投稿">
+                        </form>
                     </div>
                     <div class="box6-2">
-                        
+                        <% for(var i in comments) { %>
+                            <div class="comment">
+                                <div class="comment-icon">
+                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </div>
+                                <div class="comment-left">
+                                    <div class="comment-name">
+                                        <strong><%=comments[i].name%></strong>
+                                    </div>
+                                    <div class="comment-contents">
+                                        <%=comments[i].su1%>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
