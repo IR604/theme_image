@@ -190,7 +190,7 @@ app.get("/research", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
+    connection.query('SELECT image.*, theme.tag user from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
         if (error == null){
             imageinfo=results
         }
