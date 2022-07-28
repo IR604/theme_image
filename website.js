@@ -138,15 +138,31 @@ app.get("/tm:themelink", (req, res) => {
 // アカウントページ
 app.get("/us:akauntolink", (req, res) => {
     var akauntolink = req.params.akauntolink
-
+    var themeinfo;
+    var imageinfo;
+    var name = 'ir604'
     var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();    
+    connection.connect();
+    connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
+        if (error == null){
+            themeinfo=results
+        }
+    });
+    connection.query('SELECT * from image where account_id=?',akauntolink ,function (error, results, fields){
+        if (error == null){
+            imageinfo=results
+        }
+    });
+
     connection.query('SELECT * from user_information where item_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             res.render('akaunto.ejs',
             {
-                akauntoinfo: results[0]
+                akauntoinfo: results[0],
+                themeinfo:themeinfo,
+                imageinfo:imageinfo,
+                name:name
             });
         }
     });
@@ -190,7 +206,7 @@ app.get("/research", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT image.*, theme.tag user from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
+    connection.query('SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
         if (error == null){
             imageinfo=results
         }

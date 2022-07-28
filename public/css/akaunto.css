@@ -49,6 +49,53 @@ span{
     width: 20%;
 }
 
+.theme_ichiran{float: left;
+    width: 300px;
+    height: 100%;
+    margin-right: 5px;
+}
+.theme_top{margin-left: 5px;
+    width: 95%;
+    height: 140px;
+    margin-right: 5px;
+    background-color: #ffffff;
+    font-weight: bold;
+    border: solid 3px #000000;
+}
+.theme_bottom{
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+}
+.theme_icon{float: left;
+    width: 50px;
+    height: 50px;
+    background-color: #ffffff;
+}
+.theme_name{float: left;
+    margin-left: 10px;
+    width: 240px;
+    height: 50px;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+.image_ichiran{float: left;
+    width: 300px;
+    height: 100%;
+    margin-right: 5px;
+}
+
+.image_top{width: 100%;
+    height: 200px;
+    background-color: #777777;
+}
+.image_top2{width: 100%;
+    height: 25px;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
 .menu{position: absolute;
     top: 56px;
     background-color: #ffffff;
@@ -86,23 +133,38 @@ summary.menuber{
     border-radius:50%;
 }
 
-/* ナビゲーション */
-.ber ul	{margin: 0;
-	padding: 0;
-	list-style: none}
-.ber li a	{display: block;
-	color: #8a8a8a;
-	font-size: 30px;
-    text-decoration: none;
-    padding-left: 10px;
-    padding-right: 10px;}
-.ber li a:hover	{background-color: #dddddd}
-.ber ul:after	{content: "";
-	display: block;
-	clear: both}
-.ber li	{float: left;
-    height:100%;
-    width:auto}
+/* タブ管理 */
+.area {
+    width: 700px;
+    flex-wrap: wrap;
+    display: flex;
+}
+.tab_class {
+    margin-right:10px;
+    color: #8a8a8a;
+    width: auto;
+    height: 50px;
+    background-color: #ffffff;
+    line-height: 50px;
+    font-size: 30px;
+    text-align: center;
+    display: block;
+    float: left;
+    order: -1;
+}
+input[name="tab_name"] {
+    display: none;
+}
+input:checked + .tab_class {
+    border-bottom:solid 5px #666666;
+}
+.content_class {
+    display: none;
+    width: 100%;
+}
+input:checked + .tab_class + .content_class {
+    display: block;
+}
 
 .box1{
     height: 210px;
@@ -153,17 +215,6 @@ summary.menuber{
     color: #727272;
 }
 
-.box3{text-align: center;
-    height: 45px;
-    width: 100%;
-    background-color: #ffffff;
-    border-bottom: solid 1px #dddddd;
-}
-.box4{
-    height: 200px;
-    width: 100%;
-    background-color: #ffffff;
-}
 .box5{
     height: 250px;
     width: 100%;

@@ -31,17 +31,60 @@
             </div>
         </div>
         <div class="boxB">
-            <div class="box3">
-                <nav class="ber">
-                    <ul>
-                    <li><a href="#">テーマ</a></li>
-                    <li><a href="#">イラスト</a></li>
-                    <li><a href="#">作成したリスト</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="box4">
-                投稿一覧
+            <div class="area">
+                <input type="radio" name="tab_name" id="tab1" checked>
+                <label class="tab_class" for="tab1">テーマ</label>
+                <div class="content_class">
+                    <% for(var i in themeinfo) { %>
+                        <div class="theme_ichiran">
+                            <a href="/tm<%=themeinfo[i].item_id%>">
+                                <div class="theme_top">
+                                    <%=themeinfo[i].contents%>
+                                </div>
+                            </a>
+                            <a href="us<%-themeinfo[i].account_id%>">
+                                <div class="theme_bottom">
+                                    <div class="theme_icon">
+                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    </div>
+                                    <div class="theme_name">
+                                        <%-name%>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+                <input type="radio" name="tab_name" id="tab2" >
+                <label class="tab_class" for="tab2">イラスト</label>
+                <div class="content_class">
+                    <% for(var i in imageinfo) { %>
+                        <div class="image_ichiran">
+                            <a href="im<%-imageinfo[i].item_id%>">
+                                <div class="image_top">
+                                </div>
+                                <div class="image_top2">
+                                    <%-imageinfo[i].title%>
+                                </div>
+                            </a>
+                            <a href="us<%-imageinfo[i].account_id%>">
+                                <div class="theme_bottom">
+                                    <div class="theme_icon">
+                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    </div>
+                                    <div class="theme_name">
+                                        <%-name%>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+                <input type="radio" name="tab_name" id="tab3" >
+                <label class="tab_class" for="tab3">作成したリスト</label>
+                <div class="content_class">
+                    <p>タブ3のコンテンツを表示します</p>
+                </div>
             </div>
         </div>
     </div>
