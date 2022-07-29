@@ -1,0 +1,145 @@
+@charset "UTF-8";
+
+/*body情報*/
+body	{margin: 0;
+	font-family: 'メイリオ', 'Hiragino Kaku Gothic Pro', sans-serif}
+
+/*Googleアイコン情報*/
+span{
+    color:#727272;
+}
+
+/*ヘッダ情報*/
+.boxA::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.header1	{float: left;
+    width: 20%;
+}
+.header1-1	{float: left;
+    width: 50%;
+}
+.header2	{float: left;
+    text-align:center;
+    width: 60%;
+}
+.header3	{float: right;
+    text-align:right;
+    width: 20%;
+}
+.boxA {
+    background-color: #ffee8f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/*メニュー*/
+.menu{position: absolute;
+    top: 56px;
+    background-color: #ffffff;
+    width: 300px;
+    height: 100%;
+}
+summary.menuber{
+    padding: 2px;
+    font-weight: bold;
+    border: solid 2px black;
+    cursor :pointer;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+}
+
+/*検索フォーム*/
+.search_bar{
+    display: flex; /*アイコン、テキストボックスを調整する*/
+    align-items: center; /*アイコン、テキストボックスを縦方向の中心に*/
+    justify-content: center; /*アイコン、テキストボックスを横方向の中心に*/
+    height: 50px;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    background-color: #ddd;
+}
+#text2{
+    font-size: 16px;
+    width: 100%; /*flexの中で100%広げる*/
+    background-color: #ddd;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+    box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+}
+
+/*アイコン*/
+#avatar{
+    border-radius:50%;
+}
+
+/*テーマ一覧*/
+.theme_box{
+    height: 200px;
+    width: 100%;
+    background-color: #ffffff;
+}
+.theme_ichiran{float: left;
+    width: 300px;
+    height: 100%;
+    margin-right: 5px;
+}
+.theme_top{margin-left: 5px;
+    width: 95%;
+    height: 140px;
+    margin-right: 5px;
+    background-color: #ffffff;
+    font-weight: bold;
+    border: solid 3px #000000;
+}
+.theme_bottom{
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+}
+.theme_icon{float: left;
+    width: 50px;
+    height: 50px;
+    background-color: #ffffff;
+}
+.theme_name{float: left;
+    margin-left: 10px;
+    width: 240px;
+    height: 50px;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+/*イラスト一覧*/
+.image_box{
+    height: 270px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.image_ichiran{float: left;
+    width: 300px;
+    height: 100%;
+    margin-right: 5px;
+}
+
+.image_top{width: 100%;
+    height: 200px;
+    background-color: #777777;
+}
+.image_top2{width: 100%;
+    height: 25px;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+/*コピーライト*/
+.copyright{
+    height: 150px;
+    width: 100%;
+    color: #727272;
+    background-color: #e6e6e6;
+}
