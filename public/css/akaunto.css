@@ -103,12 +103,8 @@ input:checked + .tab_class + .content_class {
 }
 .box-follow{float:right;
     padding-right: 20px;
-    width:100px;
+    width:auto;
     height:45px;
-    font-size: 30px;
-    border-radius: 20%;
-    font-weight: bold;
-    background-color: #ffee8f;
 }
 .box-gaiyou{
     width:100%;

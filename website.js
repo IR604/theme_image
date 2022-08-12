@@ -83,27 +83,57 @@ app.get("/im:imagelink", (req, res) => {
     var msg = 'IR604'
     var akauntolink = '/us1'
     var comments;
+    var judgeresult = 0
+    var follow_id = 0
 
     var connection = mysql.createConnection(mysql_setting);
     
     connection.connect(); 
+    connection.query('SELECT follow.* from follow INNER JOIN image ON follow.follow_id=image.account_id where follow.account_id= ? and image.item_id= ?'
+    , [account_id, imagelink],function (error, results, fields){
+        if (error == null){
+            if(results[0]==null){
+                judgeresult=0
+            }else{
+                judgeresult=1
+                follow_id=results[0].item_id
+            }
+        }
+    });
+
     connection.query('SELECT *, comment.summary as su1 FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=?',imagelink ,function (error, results, fields){
         if (error == null){
             comments=results;
         }
     });   
-    connection.query('SELECT *, image.contents as c1, image.item_id as id1 from image INNER JOIN theme ON image.theme_id=theme.item_id where image.item_id=?',
+    connection.query('SELECT image.*, theme.contents as c2, theme.tag as tag, user_information.name as username from image INNER JOIN theme ON image.theme_id=theme.item_id INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
     imagelink ,function (error, results, fields){
         if (error == null){
+            var judgement
             var tag = results[0].tag;
             var tagArr = tag.split(',');
+
+            if (judgeresult==0){
+                judgement='<form action="/follow" method="post">'
+                +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
+                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                +'<input type="submit" value="フォロー" class="follow-button">'
+                +'</form>';
+            }else{
+                judgement='<form action="/deletefollow" method="post">'
+                +'<input type="hidden" name="id" value="'+follow_id+'">'
+                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
+                +'</form>';
+            }
             res.render('sample.ejs',
             {
                 akauntolink: akauntolink,
                 name: msg,
                 comments: comments,
                 imageinfo: results[0],
-                tag: tagArr
+                tag: tagArr,
+                judgement: judgement
             });
         }
     });
@@ -115,20 +145,50 @@ app.get("/tm:themelink", (req, res) => {
     var themelink = req.params.themelink
     var msg = 'IR604'
     var akauntolink = '/us1'
+    var judgeresult = 0
+    var follow_id = 0
 
     var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();    
-    connection.query('SELECT * from theme where item_id=?',themelink ,function (error, results, fields){
+    connection.connect();
+    connection.query('SELECT follow.* from follow INNER JOIN theme ON follow.follow_id=theme.account_id where follow.account_id= ? and theme.item_id= ?'
+    , [account_id, themelink],function (error, results, fields){
         if (error == null){
+            if(results[0]==null){
+                judgeresult=0
+            }else{
+                judgeresult=1
+                follow_id=results[0].item_id
+            }
+        }
+    });
+    
+    connection.query('SELECT theme.*, user_information.name as username from theme INNER JOIN user_information ON theme.account_id=user_information.item_id where theme.item_id=?',themelink ,function (error, results, fields){
+        if (error == null){
+            var judgement
             var tag = results[0].tag;
             var tagArr = tag.split(',');
+            
+            if (judgeresult==0){
+                judgement='<form action="/follow" method="post">'
+                +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
+                +'<input type="hidden" name="link" value="/tm'+themelink+'">'
+                +'<input type="submit" value="フォロー" class="follow-button">'
+                +'</form>';
+            }else{
+                judgement='<form action="/deletefollow" method="post">'
+                +'<input type="hidden" name="id" value="'+follow_id+'">'
+                +'<input type="hidden" name="link" value="/tm'+themelink+'">'
+                +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
+                +'</form>';
+            }
             res.render('theme_page.ejs',
             {
                 akauntolink: akauntolink,
                 name: msg,
                 themeinfo: results[0],
-                tag: tagArr
+                tag: tagArr,
+                judgement: judgement
             });
         }
     });
@@ -141,9 +201,29 @@ app.get("/us:akauntolink", (req, res) => {
     var themeinfo;
     var imageinfo;
     var name = 'ir604'
+    var judgement
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
+    connection.query('SELECT * from follow where account_id= ? and follow_id= ?'
+    ,[account_id, akauntolink],function (error, results, fields){
+        if (error == null){
+            if(results[0]==null){
+                judgement='<form action="/follow" method="post">'
+                +'<input type="hidden" name="id" value="'+akauntolink+'">'
+                +'<input type="hidden" name="link" value="/us'+akauntolink+'">'
+                +'<input type="submit" value="フォロー" class="follow-button">'
+                +'</form>';
+            }else{
+                judgement='<form action="/deletefollow" method="post">'
+                +'<input type="hidden" name="id" value="'+results[0].item_id+'">'
+                +'<input type="hidden" name="link" value="/us'+akauntolink+'">'
+                +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
+                +'</form>';
+            }
+        }
+    });
+
     connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             themeinfo=results
@@ -162,7 +242,8 @@ app.get("/us:akauntolink", (req, res) => {
                 akauntoinfo: results[0],
                 themeinfo:themeinfo,
                 imageinfo:imageinfo,
-                name:name
+                name:name,
+                judgement:judgement
             });
         }
     });
@@ -288,6 +369,36 @@ app.post('/comment',(req, res) => {
 
     connection.connect();
     connection.query('insert into comment set ?', data, function (error, results, fields){
+        res.redirect(redirect_link);
+    });
+
+    connection.end();
+});
+
+// フォロー処理
+app.post('/follow',(req, res) => {
+    var follow_id = req.body.id;
+    var redirect_link = req.body.link;
+    var data = {'account_id': account_id, 'follow_id':follow_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into follow set ?', data, function (error, results, fields){
+        res.redirect(redirect_link);
+    });
+
+    connection.end();
+});
+
+app.post('/deletefollow',(req, res) => {
+    var item_id = req.body.id;
+    var redirect_link = req.body.link;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from follow where item_id= ?', item_id, function (error, results, fields){
         res.redirect(redirect_link);
     });
 

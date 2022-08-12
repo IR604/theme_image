@@ -51,6 +51,37 @@ summary.menuber{
     outline: none; /*フォーカス時の枠線非表示*/
 }
 
+/*フォロー関係*/
+.follow-button {
+    display       : inline-block;
+    border-radius : 42%;          /* 角丸       */
+    font-size     : 18pt;        /* 文字サイズ */
+    text-align    : center;      /* 文字位置   */
+    cursor        : pointer;     /* カーソル   */
+    padding       : 12px 12px;   /* 余白       */
+    background    : #ffee80;     /* 背景色     */
+    color         : #ffffff;     /* 文字色     */
+    line-height   : 1em;         /* 1行の高さ  */
+    opacity       : 1;           /* 透明度     */
+    border        : 2px solid #ffee80;    /* 枠の指定 */
+  }
+  .deletefollow-button {
+    display       : inline-block;
+    border-radius : 42%;          /* 角丸       */
+    font-size     : 18pt;        /* 文字サイズ */
+    text-align    : center;      /* 文字位置   */
+    cursor        : pointer;     /* カーソル   */
+    padding       : 12px 12px;   /* 余白       */
+    background    : #ffffff;     /* 背景色     */
+    color         : #ffee80;     /* 文字色     */
+    line-height   : 1em;         /* 1行の高さ  */
+    opacity       : 1;           /* 透明度     */
+    border        : 2px solid #ffee80;    /* 枠の指定 */
+  }
+  .follow-button:hover, .deletefollow-button:hover {
+    opacity       : 0.8;         /* カーソル時透明度 */
+  }
+
 /*検索フォーム*/
 .search_bar{
     display: flex; /*アイコン、テキストボックスを調整する*/
