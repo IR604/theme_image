@@ -83,12 +83,36 @@ app.get("/im:imagelink", (req, res) => {
     var msg = 'IR604'
     var akauntolink = '/us1'
     var comments;
+    var likejudge;
     var judgeresult = 0
     var follow_id = 0
 
     var connection = mysql.createConnection(mysql_setting);
     
     connection.connect(); 
+    connection.query('SELECT * from likes where contents_id= ? and account_id= ?'
+    ,[imagelink, account_id],function (error, results, fields){
+        if (error == null){
+            if(results[0]==null){
+                likejudge='<form action="/likes" method="post">'
+                +'<input type="hidden" name="id" value="'+imagelink+'">'
+                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                +'<button type="submit" class="likebutton">'
+                +'<span class="material-symbols-outlined">grade</span>'
+                +'</button>'
+                +'</form>';
+            }else{
+                likejudge='<form action="/deletelikes" method="post">'
+                +'<input type="hidden" name="id" value="'+results[0].item_id+'">'
+                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                +'<button type="submit" class="likebutton">'
+                +'<span class="material-symbols-outlined" id="star-font">grade</span>'
+                +'</button>'
+                +'</form>';
+            }
+        }
+    });
+
     connection.query('SELECT follow.* from follow INNER JOIN image ON follow.follow_id=image.account_id where follow.account_id= ? and image.item_id= ?'
     , [account_id, imagelink],function (error, results, fields){
         if (error == null){
@@ -133,7 +157,8 @@ app.get("/im:imagelink", (req, res) => {
                 comments: comments,
                 imageinfo: results[0],
                 tag: tagArr,
-                judgement: judgement
+                judgement: judgement,
+                likejudge: likejudge
             });
         }
     });
@@ -399,6 +424,36 @@ app.post('/deletefollow',(req, res) => {
 
     connection.connect();
     connection.query('delete from follow where item_id= ?', item_id, function (error, results, fields){
+        res.redirect(redirect_link);
+    });
+
+    connection.end();
+});
+
+// いいね処理
+app.post('/likes',(req, res) => {
+    var contents_id = req.body.id;
+    var redirect_link = req.body.link;
+    var data = {'contents_id': contents_id, 'account_id':account_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into likes set ?', data, function (error, results, fields){
+        res.redirect(redirect_link);
+    });
+
+    connection.end();
+});
+
+app.post('/deletelikes',(req, res) => {
+    var item_id = req.body.id;
+    var redirect_link = req.body.link;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from likes where item_id= ?', item_id, function (error, results, fields){
         res.redirect(redirect_link);
     });
 
