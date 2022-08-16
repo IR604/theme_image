@@ -86,6 +86,7 @@ app.get("/im:imagelink", (req, res) => {
     var likejudge;
     var judgeresult = 0
     var follow_id = 0
+    var like;
 
     var connection = mysql.createConnection(mysql_setting);
     
@@ -112,7 +113,16 @@ app.get("/im:imagelink", (req, res) => {
             }
         }
     });
-
+    connection.query('SELECT contents_id, count(*) as likes FROM likes GROUP BY contents_id HAVING contents_id= ?;'
+    ,imagelink ,function (error, results, fields){
+        if (error == null){
+            if(results[0]==null){
+                like=0
+            }else{
+                like=results[0].likes
+            }
+        }
+    });
     connection.query('SELECT follow.* from follow INNER JOIN image ON follow.follow_id=image.account_id where follow.account_id= ? and image.item_id= ?'
     , [account_id, imagelink],function (error, results, fields){
         if (error == null){
@@ -158,7 +168,8 @@ app.get("/im:imagelink", (req, res) => {
                 imageinfo: results[0],
                 tag: tagArr,
                 judgement: judgement,
-                likejudge: likejudge
+                likejudge: likejudge,
+                like:like
             });
         }
     });
@@ -227,6 +238,8 @@ app.get("/us:akauntolink", (req, res) => {
     var imageinfo;
     var name = 'ir604'
     var judgement
+    var follow;
+    var follower;
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
@@ -249,6 +262,33 @@ app.get("/us:akauntolink", (req, res) => {
         }
     });
 
+    follow_connect='SELECT X.account_id, '
+    +'SUM(CASE X.kbn WHEN "follow" THEN X.cnt ELSE 0 END) AS follow,'
+    +'SUM(CASE X.kbn WHEN "follower" THEN X.cnt ELSE 0 END) AS follower '
+    +'FROM'
+    +'(SELECT "follow" AS kbn, fl.account_id AS account_id, count(fl.follow_id) AS cnt '
+    +'FROM follow fl '
+    +'GROUP BY fl.account_id '
+    +'UNION ALL '
+    +'SELECT "follower" AS kbn, flw.follow_id AS account_id, count(flw.account_id) AS cnt '
+    +'FROM follow flw '
+    +'GROUP BY flw.follow_id'
+    +') X '
+    +'GROUP BY X.account_id '
+    +'HAVING X.account_id= ?'
+    connection.query(follow_connect,akauntolink ,function (error, results, fields){
+        if (error == null){
+            follow=results[0].follow
+            follower=results[0].follower
+        }
+    });
+
+    connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
+        if (error == null){
+            themeinfo=results
+        }
+    });
+
     connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             themeinfo=results
@@ -268,7 +308,9 @@ app.get("/us:akauntolink", (req, res) => {
                 themeinfo:themeinfo,
                 imageinfo:imageinfo,
                 name:name,
-                judgement:judgement
+                judgement:judgement,
+                follow: follow,
+                follower: follower
             });
         }
     });
