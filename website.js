@@ -82,6 +82,7 @@ app.get("/im:imagelink", (req, res) => {
     var imagelink = req.params.imagelink
     var msg = 'IR604'
     var akauntolink = '/us1'
+    var sametheme;
     var comments;
     var likejudge;
     var judgeresult = 0
@@ -139,7 +140,13 @@ app.get("/im:imagelink", (req, res) => {
         if (error == null){
             comments=results;
         }
-    });   
+    });
+    connection.query('SELECT * FROM image WHERE theme_id = (SELECT theme_id FROM image WHERE item_id= ?);',imagelink ,function (error, results, fields){
+        if (error == null){
+            sametheme=results;
+        }
+    });
+
     connection.query('SELECT image.*, theme.contents as c2, theme.tag as tag, user_information.name as username from image INNER JOIN theme ON image.theme_id=theme.item_id INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
     imagelink ,function (error, results, fields){
         if (error == null){
@@ -166,6 +173,7 @@ app.get("/im:imagelink", (req, res) => {
                 name: msg,
                 comments: comments,
                 imageinfo: results[0],
+                sametheme:sametheme,
                 tag: tagArr,
                 judgement: judgement,
                 likejudge: likejudge,
@@ -181,6 +189,7 @@ app.get("/tm:themelink", (req, res) => {
     var themelink = req.params.themelink
     var msg = 'IR604'
     var akauntolink = '/us1'
+    var imageinfo;
     var judgeresult = 0
     var follow_id = 0
 
@@ -199,6 +208,13 @@ app.get("/tm:themelink", (req, res) => {
         }
     });
     
+    connection.query('SELECT * from image where theme_id= ?'
+    , themelink,function (error, results, fields){
+        if (error == null){
+            imageinfo=results
+        }
+    });
+
     connection.query('SELECT theme.*, user_information.name as username from theme INNER JOIN user_information ON theme.account_id=user_information.item_id where theme.item_id=?',themelink ,function (error, results, fields){
         if (error == null){
             var judgement
@@ -223,6 +239,7 @@ app.get("/tm:themelink", (req, res) => {
                 akauntolink: akauntolink,
                 name: msg,
                 themeinfo: results[0],
+                imageinfo: imageinfo,
                 tag: tagArr,
                 judgement: judgement
             });

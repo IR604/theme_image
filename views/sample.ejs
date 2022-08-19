@@ -94,7 +94,27 @@
                     同テーマのイラスト
                 </div>
                 <div class="box8">
-                    一覧
+                    <% for(var i in sametheme) { %>
+                        <div class="same_ichiran">
+                            <a href="im<%-sametheme[i].item_id%>">
+                                <div class="image_top">
+                                </div>
+                                <div class="image_top2">
+                                    <%-sametheme[i].title%>
+                                </div>
+                            </a>
+                            <a href="us<%-sametheme[i].account_id%>">
+                                <div class="theme_bottom">
+                                    <div class="theme_icon">
+                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    </div>
+                                    <div class="theme_name">
+                                        <%-name%>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>

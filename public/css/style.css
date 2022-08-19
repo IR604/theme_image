@@ -21,6 +21,13 @@
     clear: both;
 }
 
+/*同テーマイラスト一覧*/
+.same_ichiran{float: left;
+    width: 350px;
+    height: 100%;
+    margin-right: 5px;
+}
+
 /*コメント欄*/ 
 .comment{
     margin:2px;
@@ -46,8 +53,8 @@
 .boxB-1	{float: left;
     width: 70%;
 }
-.boxB-2	{float: left;
-    width: 30%;
+.boxB-2	{float: right;
+    width: 25%;
 }
 .boxC {
     margin: 8px;
