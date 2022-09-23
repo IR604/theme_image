@@ -2,34 +2,26 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <title>ログイン</title>
+        <title>アカウント作成</title>
         <meta name="viewport" content="width=device-width">
 
-        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
         <link rel="stylesheet" href="css/login.css">
-    </head>
+        </head>
     <body>
         <div class="boxA">
             <div class="box1">
                 <div class="box1-0">
                     <p>
-                        ログイン
+                        アカウント作成
                     </p>
                 </div>
                 <div class="box1-1">
                     <div class="box1-1-1">
-                        <div class="share">
-                            <a href="#">
-                                <div class="box1-1-3">
-                                    <i class="fa fa-google" aria-hidden="true"></i>
-                                    Googleでログイン
-                                </div>
-                            </a>
-                        </div>
                         <div class="box1-1-2">
                             <p>
-                                <form action="/login" method="post">
+                                <form action="/create_account" method="post">
                                     <div class="fields-group">
+                                        <div class="fields"><input type="text" class="inputfield" name="name" placeholder="アカウント名"></div>
                                         <div class="fields"><input type="email" class="inputfield" name="email" placeholder="メールアドレス"></div>
                                         <div class="fields"><input type="password" class="inputfield" name="password" placeholder="パスワード"></div>
                                     </div>
@@ -40,7 +32,7 @@
                     </div>
                     <div class="box1-1-1">
                         <div class="box1-1-2">
-                            アカウントを持っていない方は<a href="making_account">こちら。</a>
+                            アカウントを所持している方は<a href="login">こちら。</a>
                         </div>
                     </div>
                 </div>

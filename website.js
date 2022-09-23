@@ -38,6 +38,20 @@ var mysql_setting = {
 
 var { check, validationResult } = require('express-validator');
 
+// firebaseの設定
+const firebase = require('firebase/app')
+const firebase_auth = require('firebase/auth');
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+};
+
+firebase.initializeApp(firebaseConfig);
+
+
+// ページ一覧
 // トップページ
 app.get("/", (req, res) => {
     var msg = 'IR604'
@@ -69,9 +83,24 @@ app.get("/", (req, res) => {
     connection.end();
 });
 
+// ログイン・アカウント制作関係
 // ログインページ
 app.get("/login", (req, res) => {
     res.render('login.ejs',
+    {
+        title: 'ホームページ'
+    });
+});
+// アカウント作成ページ
+app.get("/making_account", (req, res) => {
+    res.render('account_make.ejs',
+    {
+        title: 'ホームページ'
+    });
+});
+// 確認コード入力ページ
+app.get("/enter_code", (req, res) => {
+    res.render('account_code.ejs',
     {
         title: 'ホームページ'
     });
@@ -389,6 +418,55 @@ app.get("/research", (req, res) => {
         }
     });
     connection.end();
+});
+
+// ログイン処理
+app.post('/login', (req, res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+    
+    const auth=firebase_auth.getAuth();
+    firebase_auth.signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        res.redirect('/login');
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        res.redirect('/login');
+    });
+});
+
+app.post('/create_account', (req, res) => {
+    var name = req.body.name;
+    var email = req.body.email;
+    var password = req.body.password;
+    var data = {'name': name, 'follow':0, 'follower':0, summary:''}
+
+    const auth=firebase_auth.getAuth();
+    firebase_auth.createUserWithEmailAndPassword(auth ,email, password)
+    .then((userCredential) => {
+        // Signed in
+        var user = userCredential.user;
+        console.log(user);
+
+        connection.query('insert into user_information set ?', data, function (error, results, fields){
+            res.redirect(redirect_link);
+        });
+        res.redirect('/');
+    })
+    .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        res.redirect('/making_account');
+    });
 });
 
 // テーマアップロード処理

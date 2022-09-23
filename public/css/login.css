@@ -18,7 +18,7 @@
     background-color: #ffee8f;
     border: 1px solid #999;
 }
-.box1-1{
+.box1-1, .box1-2{
     height: 90%;
     border: 1px solid #999;
     background-color: #ffffff;
@@ -27,7 +27,7 @@
     height: 100%;
     width: 50%;
 }
-.box1-1-2{
+.box1-1-2, .box1-2{
     padding: 10px;
 }
 .box1-1-3{
@@ -35,13 +35,46 @@
     background-color: #dd4b39;
     color: #ffffff;
 }
+.box1-2{
+    width: 500px
+}
+
 .share a:hover   {opacity: 0.8}
 .share a{
     text-decoration: none;
+}
+
+.fields-group{
+    margin: 10px 0px;
+}
+.fields{
+    padding:5px;
+    border:1px solid #999
+}
+.inputfield{
+    border: none; /*枠線非表示*/
+    outline: none;
+    font-size: 18px;
+}
+.submit-button {
+    display       : inline-block;
+    border-radius : 10%;          /* 角丸       */
+    font-size     : 12pt;        /* 文字サイズ */
+    text-align    : center;      /* 文字位置   */
+    cursor        : pointer;     /* カーソル   */
+    padding       : 5px 8px;   /* 余白       */
+    background    : #999;     /* 背景色     */
+    color         : #ffffff;     /* 文字色     */
+    line-height   : 1em;         /* 1行の高さ  */
+    opacity       : 1;           /* 透明度     */
+    border        : 2px solid rgb(85, 85, 85);    /* 枠の指定 */
+}
+.submit-button:hover{
+    opacity       : 0.8;         /* カーソル時透明度 */
 }
 
 p {
     /* 水平方向の中央揃え */
     margin-top: 0px;
     text-align: center;
-  }
+}
