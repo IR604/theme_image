@@ -8,7 +8,7 @@ app.use(express.static('public'));
 
 var multer = require('multer');
 var filename;
-var account_id=1;
+var account_id=0;
 var storage = multer.diskStorage({
     //ファイルの保存先を指定
     destination: function(req, file, cb){
@@ -50,6 +50,16 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+// 関数
+function judge_function() {
+    var judge
+    if(account_id==0){
+        judge='<a href="login">ログイン</a>'
+    }else{
+        judge='<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="40" height="40">'
+    }
+    return judge;
+}
 
 // ページ一覧
 // トップページ
@@ -76,7 +86,8 @@ app.get("/", (req, res) => {
                 themeinfo: results,
                 imageinfo: imageinfo,
                 imagelink: imagelink,
-                akauntolink: akauntolink
+                akauntolink: akauntolink,
+                header_icon: judge_function()
             });
         }
     });
@@ -206,7 +217,8 @@ app.get("/im:imagelink", (req, res) => {
                 tag: tagArr,
                 judgement: judgement,
                 likejudge: likejudge,
-                like:like
+                like:like,
+                header_icon: judge_function()
             });
         }
     });
@@ -270,7 +282,8 @@ app.get("/tm:themelink", (req, res) => {
                 themeinfo: results[0],
                 imageinfo: imageinfo,
                 tag: tagArr,
-                judgement: judgement
+                judgement: judgement,
+                header_icon: judge_function()
             });
         }
     });
@@ -356,7 +369,8 @@ app.get("/us:akauntolink", (req, res) => {
                 name:name,
                 judgement:judgement,
                 follow: follow,
-                follower: follower
+                follower: follower,
+                header_icon: judge_function()
             });
         }
     });
@@ -368,7 +382,8 @@ app.get("/themeupload", (req, res) => {
     res.render('theme_upload.ejs',
     {
         error:'',
-        form:{theme:''}
+        form:{theme:''},
+        header_icon: judge_function()
     });
 });
 // illustuploadページ
@@ -383,7 +398,8 @@ app.get("/illustupload", (req, res) => {
             res.render('image_upload.ejs',
             {
                 themeid: themeid,
-                themename: results[0]
+                themename: results[0],
+                header_icon: judge_function()
             });
         }
     });
@@ -413,7 +429,8 @@ app.get("/research", (req, res) => {
                 search: word,
                 name:name,
                 themeinfo: results,
-                imageinfo: imageinfo
+                imageinfo: imageinfo,
+                header_icon: judge_function()
             });
         }
     });
@@ -430,8 +447,15 @@ app.post('/login', (req, res) => {
     .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
-        res.redirect('/login');
+        console.log(user.uid);
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect(); 
+        connection.query('SELECT item_id from user_information where uid = ?',user.uid,function (error, results, fields){
+            account_id=results[0].item_id
+            res.redirect('/');
+        });
+        connection.end();
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -446,19 +470,21 @@ app.post('/create_account', (req, res) => {
     var name = req.body.name;
     var email = req.body.email;
     var password = req.body.password;
-    var data = {'name': name, 'follow':0, 'follower':0, summary:''}
+    
 
     const auth=firebase_auth.getAuth();
     firebase_auth.createUserWithEmailAndPassword(auth ,email, password)
     .then((userCredential) => {
         // Signed in
         var user = userCredential.user;
-        console.log(user);
+        var data = {'name': name, 'summary':'', 'uid': user.uid}
 
+        var connection = mysql.createConnection(mysql_setting);
+        connection.connect(); 
         connection.query('insert into user_information set ?', data, function (error, results, fields){
-            res.redirect(redirect_link);
+            res.redirect('/login');
         });
-        res.redirect('/');
+        connection.end();
     })
     .catch((error) => {
         var errorCode = error.code;
@@ -485,7 +511,8 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 
         res.render('theme_upload.ejs',{
             error: re,
-            form: {theme:req.body.theme}
+            form: {theme:req.body.theme},
+            header_icon: judge_function()
         });
     } else {
         var theme = req.body.theme;
