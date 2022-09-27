@@ -194,7 +194,9 @@ app.get("/im:imagelink", (req, res) => {
             var tag = results[0].tag;
             var tagArr = tag.split(',');
 
-            if (judgeresult==0){
+            if (results[0].account_id==account_id){
+                judgement='';
+            }else if (judgeresult==0){
                 judgement='<form action="/follow" method="post">'
                 +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
                 +'<input type="hidden" name="link" value="/im'+imagelink+'">'
@@ -262,7 +264,9 @@ app.get("/tm:themelink", (req, res) => {
             var tag = results[0].tag;
             var tagArr = tag.split(',');
             
-            if (judgeresult==0){
+            if (results[0].account_id==account_id){
+                judgement='';
+            }else if(judgeresult==0){
                 judgement='<form action="/follow" method="post">'
                 +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
                 +'<input type="hidden" name="link" value="/tm'+themelink+'">'
@@ -305,13 +309,16 @@ app.get("/us:akauntolink", (req, res) => {
     connection.query('SELECT * from follow where account_id= ? and follow_id= ?'
     ,[account_id, akauntolink],function (error, results, fields){
         if (error == null){
-            if(results[0]==null){
+            if(akauntolink==account_id){
+                judgement='';
+            }else if(results[0]==null){
                 judgement='<form action="/follow" method="post">'
                 +'<input type="hidden" name="id" value="'+akauntolink+'">'
                 +'<input type="hidden" name="link" value="/us'+akauntolink+'">'
                 +'<input type="submit" value="フォロー" class="follow-button">'
                 +'</form>';
-            }else{
+            }
+            else{
                 judgement='<form action="/deletefollow" method="post">'
                 +'<input type="hidden" name="id" value="'+results[0].item_id+'">'
                 +'<input type="hidden" name="link" value="/us'+akauntolink+'">'
@@ -337,8 +344,13 @@ app.get("/us:akauntolink", (req, res) => {
     +'HAVING X.account_id= ?'
     connection.query(follow_connect,akauntolink ,function (error, results, fields){
         if (error == null){
-            follow=results[0].follow
-            follower=results[0].follower
+            if(results[0]==null){
+                follow=0;
+                follower=0;
+            }else{
+                follow=results[0].follow
+                follower=results[0].follower
+            }
         }
     });
 
@@ -379,31 +391,39 @@ app.get("/us:akauntolink", (req, res) => {
 
 // themeuploadページ
 app.get("/themeupload", (req, res) => {
-    res.render('theme_upload.ejs',
-    {
-        error:'',
-        form:{theme:''},
-        header_icon: judge_function()
-    });
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        res.render('theme_upload.ejs',
+        {
+            error:'',
+            form:{theme:''},
+            header_icon: judge_function()
+        });
+    }
 });
 // illustuploadページ
 app.get("/illustupload", (req, res) => {
-    var themeid = req.query.id
-    
-    var connection = mysql.createConnection(mysql_setting);
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var themeid = req.query.id
+        
+        var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();    
-    connection.query('SELECT contents from theme where item_id=?',themeid ,function (error, results, fields){
-        if (error == null){
-            res.render('image_upload.ejs',
-            {
-                themeid: themeid,
-                themename: results[0],
-                header_icon: judge_function()
-            });
-        }
-    });
-    connection.end();
+        connection.connect();    
+        connection.query('SELECT contents from theme where item_id=?',themeid ,function (error, results, fields){
+            if (error == null){
+                res.render('image_upload.ejs',
+                {
+                    themeid: themeid,
+                    themename: results[0],
+                    header_icon: judge_function()
+                });
+            }
+        });
+        connection.end();
+    }
 });
 
 // researchページ
@@ -549,35 +569,43 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
 
 // コメントアップロード処理
 app.post('/comment',(req, res) => {
-    var summary = req.body.comment;
-    var image_id = req.body.id;
-    var redirect_link = req.body.link;
-    var data = {'summary':summary, 'image_id':image_id, 'account_id': account_id}
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var summary = req.body.comment;
+        var image_id = req.body.id;
+        var redirect_link = req.body.link;
+        var data = {'summary':summary, 'image_id':image_id, 'account_id': account_id}
 
-    var connection = mysql.createConnection(mysql_setting);
+        var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();
-    connection.query('insert into comment set ?', data, function (error, results, fields){
-        res.redirect(redirect_link);
-    });
+        connection.connect();
+        connection.query('insert into comment set ?', data, function (error, results, fields){
+            res.redirect(redirect_link);
+        });
 
-    connection.end();
+        connection.end();
+    }
 });
 
 // フォロー処理
 app.post('/follow',(req, res) => {
-    var follow_id = req.body.id;
-    var redirect_link = req.body.link;
-    var data = {'account_id': account_id, 'follow_id':follow_id}
-
-    var connection = mysql.createConnection(mysql_setting);
-
-    connection.connect();
-    connection.query('insert into follow set ?', data, function (error, results, fields){
-        res.redirect(redirect_link);
-    });
-
-    connection.end();
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var follow_id = req.body.id;
+        var redirect_link = req.body.link;
+        var data = {'account_id': account_id, 'follow_id':follow_id}
+    
+        var connection = mysql.createConnection(mysql_setting);
+    
+        connection.connect();
+        connection.query('insert into follow set ?', data, function (error, results, fields){
+            res.redirect(redirect_link);
+        });
+    
+        connection.end();
+    }
 });
 
 app.post('/deletefollow',(req, res) => {
@@ -596,18 +624,22 @@ app.post('/deletefollow',(req, res) => {
 
 // いいね処理
 app.post('/likes',(req, res) => {
-    var contents_id = req.body.id;
-    var redirect_link = req.body.link;
-    var data = {'contents_id': contents_id, 'account_id':account_id}
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var contents_id = req.body.id;
+        var redirect_link = req.body.link;
+        var data = {'contents_id': contents_id, 'account_id':account_id}
 
-    var connection = mysql.createConnection(mysql_setting);
+        var connection = mysql.createConnection(mysql_setting);
 
-    connection.connect();
-    connection.query('insert into likes set ?', data, function (error, results, fields){
-        res.redirect(redirect_link);
-    });
+        connection.connect();
+        connection.query('insert into likes set ?', data, function (error, results, fields){
+            res.redirect(redirect_link);
+        });
 
-    connection.end();
+        connection.end();
+    }
 });
 
 app.post('/deletelikes',(req, res) => {
