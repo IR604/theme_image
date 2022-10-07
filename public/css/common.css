@@ -37,10 +37,45 @@ span{
 
 /*メニュー*/
 .menu{position: absolute;
-    top: 56px;
-    background-color: #ffffff;
+    top: 70px;
+    background-color: #f0f0f0;
     width: 300px;
     height: 100%;
+}
+.menu_user::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.menu_icon {float:left}
+.menu_right {float:left;
+    margin-left:10px}
+.menu_name{
+    font-weight: bold;
+    font-size: 20px;}
+.menu h2{
+    margin:5px;
+    margin-top:20px;
+    color:#727272;
+    border-bottom: solid 1px #727272
+}
+.menu ul	{margin: 0;
+	padding: 0;
+	list-style: none}
+.menu ul a	{margin: 0;
+    padding: 0;
+    list-style: none;
+    color:#727272;
+    text-decoration: none}
+.menu li{
+    padding: 5px 0px;
+    background-color: #f0f0f0;
+    font-size: 19px;
+    width: 300px;
+    height: 30px;
+}
+.menu li:hover{
+    background-color: #cacaca;
 }
 summary.menuber{
     padding: 2px;

@@ -51,14 +51,116 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 // 関数
+// ログインリンクかアイコンを設置
 function judge_function() {
     var judge
     if(account_id==0){
         judge='<a href="login">ログイン</a>'
     }else{
-        judge='<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="40" height="40">'
+        judge='<a href="us'+account_id+'">'
+        +'<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="40" height="40">'
+        +'</a>'
     }
     return judge;
+}
+
+// メニューの表示内容を設置
+var menu_follow
+var menu_follower
+var menu_name
+function menu_db(){
+    var connection = mysql.createConnection(mysql_setting);
+    connection.connect();
+    follow_connect='SELECT X.account_id, '
+    +'SUM(CASE X.kbn WHEN "follow" THEN X.cnt ELSE 0 END) AS follow,'
+    +'SUM(CASE X.kbn WHEN "follower" THEN X.cnt ELSE 0 END) AS follower '
+    +'FROM'
+    +'(SELECT "follow" AS kbn, fl.account_id AS account_id, count(fl.follow_id) AS cnt '
+    +'FROM follow fl '
+    +'GROUP BY fl.account_id '
+    +'UNION ALL '
+    +'SELECT "follower" AS kbn, flw.follow_id AS account_id, count(flw.account_id) AS cnt '
+    +'FROM follow flw '
+    +'GROUP BY flw.follow_id'
+    +') X '
+    +'GROUP BY X.account_id '
+    +'HAVING X.account_id= ?'
+    connection.query(follow_connect,account_id ,function (error, results, fields){
+        if (error == null){
+            if(results[0]==null){
+                menu_follow=0;
+                menu_follower=0;
+            }else{
+                menu_follow=results[0].follow
+                menu_follower=results[0].follower
+            }
+        }
+    });
+    connection.query('SELECT name from user_information where item_id=?',account_id ,function (error, results, fields){
+        if (error == null){
+            menu_name=results[0].name;
+        }
+    });
+    connection.end();
+}
+function menu_summary(){
+    var judge
+    if(account_id==0){
+        judge='<ul>'
+        +'<h2>ページ</h2>'
+        +'<a href="/">'
+        +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
+        +'</a>'
+        +'<h2>設定</h2>'
+        +'<a href="/login">'
+        +'<li><span class="material-symbols-outlined">login</span>　ログイン</li>'
+        +'</a>'
+        +'</ul>'
+        return judge
+    }else{
+        menu_db()
+        judge='<div class="menu_user">'
+        +'<div class="menu_icon">'
+        +'<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="100" height="100">'
+        +'</div>'
+        +'<div class="menu_right">'
+        +'<div class="menu_name">'
+        +menu_name
+        +'</div>'
+        +'<div class="menu_follow">'
+        +'フォロー：'+menu_follow+'<br>'
+        +'フォロワー：'+menu_follower
+        +'</div>'
+        +'</div>'
+        +'</div>'
+        +'<h2>ページ</h2>'
+        +'<ul>'
+        +'<a href="/">'
+        +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
+        +'</a>'
+        +'<a href="/us'+account_id+'">'
+        +'<li><span class="material-symbols-outlined">person</span>　マイページ</li>'
+        +'</a>'
+        +'<h2>コンテンツ</h2>'
+        +'<a href="#">'
+        +'<li><span class="material-symbols-outlined">article</span>　フォローユーザーのテーマ</li>'
+        +'</a>'
+        +'<a href="#">'
+        +'<li><span class="material-symbols-outlined">image</span>　フォローユーザーのイラスト</li>'
+        +'</a>'
+        +'<a href="#">'
+        +'<li><span class="material-symbols-outlined">star</span>　いいね一覧</li>'
+        +'</a>'
+        +'<h2>設定</h2>'
+        +'<a href="#">'
+        +'<li><span class="material-symbols-outlined">settings</span>　設定</li>'
+        +'</a>'
+        +'<a href="#">'
+        +'<li><span class="material-symbols-outlined">logout</span>　ログアウト</li>'
+        +'</a>'
+        +'</ul>'
+        return judge
+    }
 }
 
 // ページ一覧
@@ -87,7 +189,8 @@ app.get("/", (req, res) => {
                 imageinfo: imageinfo,
                 imagelink: imagelink,
                 akauntolink: akauntolink,
-                header_icon: judge_function()
+                header_icon: judge_function(),
+                header_menu:menu_summary()
             });
         }
     });
@@ -220,7 +323,8 @@ app.get("/im:imagelink", (req, res) => {
                 judgement: judgement,
                 likejudge: likejudge,
                 like:like,
-                header_icon: judge_function()
+                header_icon: judge_function(),
+                header_menu:menu_summary()
             });
         }
     });
@@ -287,7 +391,8 @@ app.get("/tm:themelink", (req, res) => {
                 imageinfo: imageinfo,
                 tag: tagArr,
                 judgement: judgement,
-                header_icon: judge_function()
+                header_icon: judge_function(),
+                header_menu:menu_summary()
             });
         }
     });
@@ -382,7 +487,8 @@ app.get("/us:akauntolink", (req, res) => {
                 judgement:judgement,
                 follow: follow,
                 follower: follower,
-                header_icon: judge_function()
+                header_icon: judge_function(),
+                header_menu:menu_summary()
             });
         }
     });
@@ -398,7 +504,8 @@ app.get("/themeupload", (req, res) => {
         {
             error:'',
             form:{theme:''},
-            header_icon: judge_function()
+            header_icon: judge_function(),
+            header_menu:menu_summary()
         });
     }
 });
@@ -418,7 +525,8 @@ app.get("/illustupload", (req, res) => {
                 {
                     themeid: themeid,
                     themename: results[0],
-                    header_icon: judge_function()
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
                 });
             }
         });
@@ -450,7 +558,8 @@ app.get("/research", (req, res) => {
                 name:name,
                 themeinfo: results,
                 imageinfo: imageinfo,
-                header_icon: judge_function()
+                header_icon: judge_function(),
+                header_menu:menu_summary()
             });
         }
     });
