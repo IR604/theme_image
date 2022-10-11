@@ -22,7 +22,15 @@
                 <div class="search_bar">
                     <span class="material-symbols-outlined">search</span>
                     <input id="text2" type="text" placeholder="キーワードを入力" name="search">
-                    <span class="material-symbols-outlined">close</span>
+                    <details>
+                        <summary class="menuber">
+                            <span class="material-symbols-outlined">settings</span>
+                        </summary>
+                        <div class="setting_summary">
+                            <div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag" checked>タグ部分一致</div>
+                            <div class="setting_sample"><input type="radio" class="decided" name="decide" value="title">タイトル部分一致</div>
+                        </div>
+                    </details>
                 </div>
             </form>
         </div>

@@ -77,6 +77,19 @@ span{
 .menu li:hover{
     background-color: #cacaca;
 }
+.setting_summary{position: absolute;
+    height:auto;
+    width:250px;
+    border: solid 2px #cacaca;
+    background-color: #ffffff;
+}
+.setting_sample{
+    padding:5px 0px;
+    text-align:left;
+    color:#777777;
+    font-size:20px;
+    border-bottom: solid 1px #cacaca;
+}
 summary.menuber{
     padding: 2px;
     font-weight: bold;

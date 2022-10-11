@@ -537,24 +537,36 @@ app.get("/illustupload", (req, res) => {
 // researchページ
 app.get("/research", (req, res) => {
     var word = req.query.search;
+    var word_split=word.split(/[ 　]/)
     var title = word + 'の検索結果'
     var name = 'ir604'
     var imageinfo;
     
     var connection = mysql.createConnection(mysql_setting);
 
+    var DB_result=''
+    var Search_ber=''
+    for(var i in word_split){
+        Search_ber+=word_split[i]
+        DB_result+='theme.tag like "%'+word_split[i]+'%"'
+        if(i!=word_split.length-1){
+            Search_ber+=' '
+            DB_result+=' and '
+        }
+    }
+
     connection.connect();
-    connection.query('SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where theme.tag like ? ','%'+word+'%' ,function (error, results, fields){
+    connection.query('SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where '+DB_result ,function (error, results, fields){
         if (error == null){
             imageinfo=results
         }
     });
-    connection.query('SELECT * from theme where tag like ? ','%'+word+'%' ,function (error, results, fields){
+    connection.query('SELECT * from theme where '+DB_result ,function (error, results, fields){
         if (error == null){
             res.render('research.ejs',
             {
                 title: title,
-                search: word,
+                search: Search_ber,
                 name:name,
                 themeinfo: results,
                 imageinfo: imageinfo,
