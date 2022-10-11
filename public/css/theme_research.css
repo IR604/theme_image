@@ -59,6 +59,21 @@
     font-weight: bold;
 }
 
+.user_ichiran{float: left;
+    width: auto;
+    height: 100%;
+    margin-right: 5px;
+    margin-left:10px;
+    background-color: #ffffff;
+}
+.user_bottom{
+    width: 100%;
+    height: auto;
+    font-weight: bold;
+    font-size: 20px;
+    text-align:center;
+}
+
 .boxB {
     padding-bottom: auto;
 }

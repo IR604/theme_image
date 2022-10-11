@@ -541,21 +541,30 @@ app.get("/research", (req, res) => {
     var title = word + 'の検索結果'
     var name = 'ir604'
     var imageinfo;
+    var userinfo;
     
     var connection = mysql.createConnection(mysql_setting);
 
     var DB_result=''
+    var DB_result_name=''
     var Search_ber=''
     for(var i in word_split){
         Search_ber+=word_split[i]
         DB_result+='theme.tag like "%'+word_split[i]+'%"'
+        DB_result_name+='name like "%'+word_split[i]+'%"'
         if(i!=word_split.length-1){
             Search_ber+=' '
             DB_result+=' and '
+            DB_result_name+=' and '
         }
     }
 
     connection.connect();
+    connection.query('SELECT * from user_information where '+DB_result_name ,function (error, results, fields){
+        if (error == null){
+            userinfo=results
+        }
+    });
     connection.query('SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where '+DB_result ,function (error, results, fields){
         if (error == null){
             imageinfo=results
@@ -570,6 +579,7 @@ app.get("/research", (req, res) => {
                 name:name,
                 themeinfo: results,
                 imageinfo: imageinfo,
+                userinfo: userinfo,
                 header_icon: judge_function(),
                 header_menu:menu_summary()
             });
