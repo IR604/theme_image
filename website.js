@@ -537,45 +537,62 @@ app.get("/illustupload", (req, res) => {
 // researchページ
 app.get("/research", (req, res) => {
     var word = req.query.search;
+    var type = req.query.decide;
+
     var word_split=word.split(/[ 　]/)
     var title = word + 'の検索結果'
     var name = 'ir604'
     var imageinfo;
     var userinfo;
-    
-    var connection = mysql.createConnection(mysql_setting);
 
-    var DB_result=''
-    var DB_result_name=''
+    var DB_result_theme='SELECT * from theme where '
+    var DB_result_image='SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where '
+    var DB_result_name='SELECT * from user_information where '
     var Search_ber=''
+    var setting='<div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag" checked>タグ部分一致</div>'
+    +'<div class="setting_sample"><input type="radio" class="decided" name="decide" value="title">タイトル部分一致</div>'
     for(var i in word_split){
         Search_ber+=word_split[i]
-        DB_result+='theme.tag like "%'+word_split[i]+'%"'
+        if(type=='tag'){
+            DB_result_theme+='tag like "%'+word_split[i]+'%"'
+            DB_result_image+='theme.tag like "%'+word_split[i]+'%"'
+        }else{
+            DB_result_theme+='contents like "%'+word_split[i]+'%"'
+            DB_result_image+='image.title like "%'+word_split[i]+'%"'
+            setting='<div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag">タグ部分一致</div>'
+            +'<div class="setting_sample"><input type="radio" class="decided" name="decide" value="title" checked>タイトル部分一致</div>'
+        }
         DB_result_name+='name like "%'+word_split[i]+'%"'
         if(i!=word_split.length-1){
             Search_ber+=' '
-            DB_result+=' and '
+            DB_result_theme+=' and '
+            DB_result_image+=' and '
             DB_result_name+=' and '
         }
     }
-
+    
+    var connection = mysql.createConnection(mysql_setting);
     connection.connect();
-    connection.query('SELECT * from user_information where '+DB_result_name ,function (error, results, fields){
+    // ユーザー
+    connection.query(DB_result_name ,function (error, results, fields){
         if (error == null){
             userinfo=results
         }
     });
-    connection.query('SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where '+DB_result ,function (error, results, fields){
+    // イラスト
+    connection.query(DB_result_image ,function (error, results, fields){
         if (error == null){
             imageinfo=results
         }
     });
-    connection.query('SELECT * from theme where '+DB_result ,function (error, results, fields){
+    // テーマ
+    connection.query(DB_result_theme ,function (error, results, fields){
         if (error == null){
             res.render('research.ejs',
             {
                 title: title,
                 search: Search_ber,
+                setting:setting,
                 name:name,
                 themeinfo: results,
                 imageinfo: imageinfo,
