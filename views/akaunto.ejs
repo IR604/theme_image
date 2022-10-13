@@ -84,7 +84,31 @@
                 <input type="radio" name="tab_name" id="tab3" >
                 <label class="tab_class" for="tab3">作成したリスト</label>
                 <div class="content_class">
-                    <p>タブ3のコンテンツを表示します</p>
+                    <%-make_list%>
+                    <div class="lists">
+                        <% for(var i in listinfo) { %>
+                            <div class="theme_ichiran">
+                                <a href="/tm<%=listinfo[i].item_id%>">
+                                    <div class="theme_top">
+                                        <%=listinfo[i].type%>
+                                    </div>
+                                    <div class="image_top2">
+                                        <%=listinfo[i].title%>
+                                    </div>
+                                </a>
+                                <a href="us<%-listinfo[i].account_id%>">
+                                    <div class="theme_bottom">
+                                        <div class="theme_icon">
+                                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                        </div>
+                                        <div class="theme_name">
+                                            name
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
                 </div>
             </div>
         </div>

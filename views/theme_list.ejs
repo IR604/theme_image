@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>タイトル</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/ichiran.css">
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    <div class="boxC">
+        <div class="boxD">
+            <div class="box3-1">
+                話題のテーマ
+            </div>
+            <div class="theme_box">
+                <% for(var i in themeinfo) { %>
+                    <div class="theme_ichiran">
+                        <a href="/tm<%=themeinfo[i].item_id%>">
+                            <div class="theme_top">
+                                <%=themeinfo[i].contents%>
+                            </div>
+                        </a>
+                        <a href="us<%-themeinfo[i].account_id%>">
+                            <div class="theme_bottom">
+                                <div class="theme_icon">
+                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </div>
+                                <div class="theme_name">
+                                    name
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <div class="copyright">
+        コピーライト
+    </div>
+</body>
+</html>

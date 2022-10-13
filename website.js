@@ -399,15 +399,51 @@ app.get("/tm:themelink", (req, res) => {
     connection.end();
 });
 
+// 一覧ページ
+app.get("/theme_list", (req, res) => {
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * from theme',function (error, results, fields){
+        if (error == null){
+            res.render('theme_list.ejs',
+            {
+                themeinfo: results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+app.get("/illust_list", (req, res) => {
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * from image',function (error, results, fields){
+           if (error == null){
+            res.render('image_list.ejs',
+            {
+                imageinfo: results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+
 // アカウントページ
 app.get("/us:akauntolink", (req, res) => {
     var akauntolink = req.params.akauntolink
     var themeinfo;
     var imageinfo;
+    var listinfo;
     var name = 'ir604'
     var judgement
     var follow;
     var follower;
+    var make_list='';
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
@@ -415,6 +451,19 @@ app.get("/us:akauntolink", (req, res) => {
     ,[account_id, akauntolink],function (error, results, fields){
         if (error == null){
             if(akauntolink==account_id){
+                make_list='<details>'
+                +'<summary class="menuber">'
+                +'<div class="make_list"><span class="material-symbols-outlined">add</span>リストを作成</div>'
+                +'</summary>'
+                +'<div class="setting_summary">'
+                +'<form action="/create_list" method="post">'
+                +'<input type="text" class="inputfield" name="title" placeholder="タイトル">'
+                +'<div class="setting_sample"><input type="radio" class="decided" name="type" value="theme" checked>テーマ</div>'
+                +'<div class="setting_sample"><input type="radio" class="decided" name="type" value="image">イラスト</div>'
+                +'<input type="submit" value="作成">'
+                +'</form>'
+                +'</div>'
+                +'</details>'
                 judgement='';
             }else if(results[0]==null){
                 judgement='<form action="/follow" method="post">'
@@ -459,17 +508,19 @@ app.get("/us:akauntolink", (req, res) => {
         }
     });
 
+    // リスト情報
+    connection.query('SELECT * from lists where account_id=?',akauntolink ,function (error, results, fields){
+        if (error == null){
+            listinfo=results
+        }
+    });
+    // テーマ情報
     connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             themeinfo=results
         }
     });
-
-    connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
-        if (error == null){
-            themeinfo=results
-        }
-    });
+    // イラスト情報
     connection.query('SELECT * from image where account_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             imageinfo=results
@@ -483,10 +534,12 @@ app.get("/us:akauntolink", (req, res) => {
                 akauntoinfo: results[0],
                 themeinfo:themeinfo,
                 imageinfo:imageinfo,
+                listinfo:listinfo,
                 name:name,
                 judgement:judgement,
                 follow: follow,
                 follower: follower,
+                make_list: make_list,
                 header_icon: judge_function(),
                 header_menu:menu_summary()
             });
@@ -714,6 +767,37 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
 
     connection.end();
 });
+
+// リスト作成処理
+app.post('/create_list',(req, res) => {
+    var title = req.body.title;
+    var type = req.body.type;
+    var data = {'title':title, 'type':type, 'account_id': account_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into lists set ?', data, function (error, results, fields){
+        res.redirect('/us'+account_id);
+    });
+
+    connection.end();
+});
+// コンテンツの追加
+app.post('/contents_insert',upload.single('file'),(req, res) => {
+    var list_id = req.body.list_id;
+    var contents_id = req.body.contents_id;
+    var data = {'list_id':list_id, 'contents_id':contents_id}
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('insert into list_contents set ?', data, function (error, results, fields){
+        res.redirect('/');
+    });
+
+    connection.end();
+});2
 
 // コメントアップロード処理
 app.post('/comment',(req, res) => {

@@ -13,6 +13,12 @@
     clear: both;
 }
 
+.boxD::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 .boxB {
     padding-bottom: auto;
 }
@@ -22,6 +28,10 @@
 
 .boxC {
     margin: 8px;
+}
+
+.boxD{
+    margin-top: 10px;
 }
 
 .box1{
