@@ -235,6 +235,24 @@ app.get("/im:imagelink", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
     
     connection.connect(); 
+    var list_add=''
+    if(account_id==0){
+        list_add='<a href="login">ログインが必要です。</a>'
+    }else{
+        list_add='<form action="/contents_insert" method="post">'
+        +'<input type="hidden" name="contents_id" value="'+imagelink+'">'
+        +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+        connection.query('SELECT * from lists where account_id=? and type="image"',account_id,function (error, results, fields){
+            if (error == null){
+                for(var i in results){
+                    list_add+='<div class="setting_sample"><input type="radio" class="decided" name="list_id" value='+results[i].item_id+'>'+results[i].title+'</div>';
+                }
+                list_add+='<input type="submit" value="投稿"></input>'
+                +'</form>'
+            }
+        });
+    }
+
     connection.query('SELECT * from likes where contents_id= ? and account_id= ?'
     ,[imagelink, account_id],function (error, results, fields){
         if (error == null){
@@ -323,6 +341,7 @@ app.get("/im:imagelink", (req, res) => {
                 judgement: judgement,
                 likejudge: likejudge,
                 like:like,
+                list_add: list_add,
                 header_icon: judge_function(),
                 header_menu:menu_summary()
             });
@@ -343,6 +362,25 @@ app.get("/tm:themelink", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
+
+    var list_add=''
+    if(account_id==0){
+        list_add='<a href="login">ログインが必要です。</a>'
+    }else{
+        list_add='<form action="/contents_insert" method="post">'
+        +'<input type="hidden" name="contents_id" value="'+themelink+'">'
+        +'<input type="hidden" name="link" value="/tm'+themelink+'">'
+        connection.query('SELECT * from lists where account_id=? and type="theme"',account_id,function (error, results, fields){
+            if (error == null){
+                for(var i in results){
+                    list_add+='<div class="setting_sample"><input type="radio" class="decided" name="list_id" value='+results[i].item_id+'>'+results[i].title+'</div>';
+                }
+                list_add+='<input type="submit" value="投稿"></input>'
+                +'</form>'
+            }
+        });
+    }
+    
     connection.query('SELECT follow.* from follow INNER JOIN theme ON follow.follow_id=theme.account_id where follow.account_id= ? and theme.item_id= ?'
     , [account_id, themelink],function (error, results, fields){
         if (error == null){
@@ -391,6 +429,7 @@ app.get("/tm:themelink", (req, res) => {
                 imageinfo: imageinfo,
                 tag: tagArr,
                 judgement: judgement,
+                list_add: list_add,
                 header_icon: judge_function(),
                 header_menu:menu_summary()
             });
@@ -400,6 +439,50 @@ app.get("/tm:themelink", (req, res) => {
 });
 
 // 一覧ページ
+// リストに追加されたコンテンツ
+app.get("/li:listlink", (req, res) => {
+    var listlink = req.params.listlink
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    var judge=''
+    var title=''
+    connection.query('SELECT type, title from lists where item_id=?',listlink,function (error, results, fields){
+        if (error == null){
+            judge=results[0].type
+            title=results[0].title
+        }
+    });
+
+    
+    connection.query('SELECT * FROM theme where item_id IN (SELECT contents_id from list_contents where list_id=?)',listlink,function (error, results, fields){
+        if (error == null){
+            if(judge=='theme'){
+                res.render('theme_list.ejs',
+                {
+                    title: title,
+                    themeinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        }
+    });
+    connection.query('SELECT * FROM image where item_id IN (SELECT contents_id from list_contents where list_id=?)',listlink,function (error, results, fields){
+        if (error == null){
+            if(judge=='image'){
+                res.render('image_list.ejs',
+                {
+                    title: title,
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        }
+    });
+    connection.end();
+});
 app.get("/theme_list", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
@@ -787,17 +870,18 @@ app.post('/create_list',(req, res) => {
 app.post('/contents_insert',upload.single('file'),(req, res) => {
     var list_id = req.body.list_id;
     var contents_id = req.body.contents_id;
+    var link=req.body.link;
     var data = {'list_id':list_id, 'contents_id':contents_id}
 
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
     connection.query('insert into list_contents set ?', data, function (error, results, fields){
-        res.redirect('/');
+        res.redirect(link);
     });
 
     connection.end();
-});2
+});
 
 // コメントアップロード処理
 app.post('/comment',(req, res) => {
