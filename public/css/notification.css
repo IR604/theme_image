@@ -1,0 +1,39 @@
+@charset "UTF-8";
+
+
+.notification_box{
+    margin: 25px;
+    width: 95%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.box1{
+    width: 60%;
+    border: solid 2px #777777;
+}
+.box1 h1{
+    margin:0px;
+    color: #777777;
+    font-size: 30px;
+    text-align: center;
+    background-color: #ffee8f;
+}
+.box1 ul{
+    list-style: none;
+    padding: 0px;
+    margin:0px;
+}
+.box1 li{
+    border-top:solid 1px #777777;
+    padding: 10px 0px;
+    background-color: #ffffff;
+}
+.box1 li:hover{
+    background-color: #eaeaea;
+}
+.box1 a{
+    text-decoration: none;
+    color: #000000;
+}

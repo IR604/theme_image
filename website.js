@@ -741,6 +741,25 @@ app.get("/research", (req, res) => {
     connection.end();
 });
 
+// 通知ページ
+app.get("/notification", (req, res) => {
+    res.render('notification.ejs',
+    {
+        header_icon: judge_function(),
+        header_menu:menu_summary()
+    });
+});
+
+// フォロー・フォロワー一覧
+// フォロー一覧
+app.get("/follow", (req, res) => {
+    res.render('user_list.ejs',
+    {
+        header_icon: judge_function(),
+        header_menu:menu_summary()
+    });
+});
+
 // ログイン処理
 app.post('/login', (req, res) => {
     var email = req.body.email;
