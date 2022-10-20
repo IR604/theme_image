@@ -112,8 +112,8 @@ summary.menuber{
     line-height   : 1em;         /* 1行の高さ  */
     opacity       : 1;           /* 透明度     */
     border        : 2px solid #ffee80;    /* 枠の指定 */
-  }
-  .deletefollow-button {
+}
+.deletefollow-button {
     display       : inline-block;
     border-radius : 42%;          /* 角丸       */
     font-size     : 18pt;        /* 文字サイズ */
@@ -125,10 +125,15 @@ summary.menuber{
     line-height   : 1em;         /* 1行の高さ  */
     opacity       : 1;           /* 透明度     */
     border        : 2px solid #ffee80;    /* 枠の指定 */
-  }
-  .follow-button:hover, .deletefollow-button:hover {
+}
+.follow-button:hover, .deletefollow-button:hover {
     opacity       : 0.8;         /* カーソル時透明度 */
-  }
+}
+.followlink{
+    text-decoration: none;
+    color: #000000;
+}
+
 
 /*検索フォーム*/
 .search_bar{

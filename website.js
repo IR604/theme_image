@@ -128,9 +128,9 @@ function menu_summary(){
         +menu_name
         +'</div>'
         +'<div class="menu_follow">'
-        +'フォロー：'+menu_follow+'<br>'
-        +'フォロワー：'+menu_follower
-        +'</div>'
+        +'<a href="/follow?id='+account_id+'" class="followlink">フォロー：'+menu_follow+'</a><br>'
+        +'<a href="/follower?id='+account_id+'" class="followlink">フォロワー：'+menu_follower
+        +'</a></div>'
         +'</div>'
         +'</div>'
         +'<h2>ページ</h2>'
@@ -753,11 +753,62 @@ app.get("/notification", (req, res) => {
 // フォロー・フォロワー一覧
 // フォロー一覧
 app.get("/follow", (req, res) => {
-    res.render('user_list.ejs',
-    {
-        header_icon: judge_function(),
-        header_menu:menu_summary()
+    var user_id = req.query.id;
+
+    var title=''
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT name from user_information where item_id=?',user_id ,function (error, results, fields){
+        if (error == null){
+            title=results[0].name+'がフォローしたユーザー'
+        }
     });
+
+    connection.query('SELECT * from user_information where item_id IN '
+    +'(SELECT follow_id FROM follow where account_id= ?)',user_id ,function (error, results, fields){
+        if (error == null){
+            res.render('user_list.ejs',
+            {
+                title:title,
+                userinfo:results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+
+// フォロワー一覧
+app.get("/follower", (req, res) => {
+    var user_id = req.query.id;
+
+    var title=''
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT name from user_information where item_id=?',user_id ,function (error, results, fields){
+        if (error == null){
+            title=results[0].name+'をフォローしたユーザー'
+        }
+    });
+
+    connection.query('SELECT * from user_information where item_id IN '
+    +'(SELECT account_id FROM follow where follow_id= ?)',user_id ,function (error, results, fields){
+        if (error == null){
+            res.render('user_list.ejs',
+            {
+                title:title,
+                userinfo:results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
 });
 
 // ログイン処理

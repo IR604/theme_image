@@ -14,34 +14,23 @@
     <%- include('header')%>
     <div class="notification_box">
         <div class="box1">
-            <h1>IR604がフォローしたユーザー</h1>
+            <h1><%=title%></h1>
         <ul>
-            <a href="#"><li>
-                <div class="box2">
-                    <img src="images/icons/2.jpg" id="avatar" alt=""  width="75" height="75">
-                </div>
-                <div class="box3">
-                    <div class="box3-1">
-                        sub_account
+            <% for(var i in userinfo) { %>
+                <a href="us<%-userinfo[i].item_id%>"><li>
+                    <div class="box2">
+                        <img src="images/icons/<%-userinfo[i].item_id%>.jpg" id="avatar" alt=""  width="75" height="75">
                     </div>
-                    <div class="box3-2">
-                        sample
+                    <div class="box3">
+                        <div class="box3-1">
+                            <%-userinfo[i].name%>
+                        </div>
+                        <div class="box3-2">
+                            <%-userinfo[i].summary%>
+                        </div>
                     </div>
-                </div>
-            </li></a>
-            <a href="#"><li>
-                <div class="box2">
-                    <img src="images/icons/2.jpg" id="avatar" alt=""  width="75" height="75">
-                </div>
-                <div class="box3">
-                    <div class="box3-1">
-                        sub_account
-                    </div>
-                    <div class="box3-2">
-                        sample
-                    </div>
-                </div>
-            </li></a>
+                </li></a>
+            <% } %>
         </ul>
         </div>
     </div>

@@ -23,7 +23,10 @@
             <div class="box2-2">
                 <div class="box-nf">
                     <div class="box-name"><%-akauntoinfo.name%></div>
-                    <div class="box-follower">フォロー：<%-follow%>　フォロワー：<%-follower%></div>
+                    <div class="box-follower">
+                        <a href="/follow?id=<%-akauntoinfo.item_id%>" class="followlink">フォロー：<%-follow%></a>
+                        　<a href="/follower?id=<%-akauntoinfo.item_id%>" class="followlink">フォロワー：<%-follower%></a>
+                    </div>
                     <div class="box-follow">
                         <%-judgement%>
                     </div>
