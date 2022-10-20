@@ -129,6 +129,19 @@ input:checked + .tab_class + .content_class {
     font-size: 18px;
 }
 
+.list_top{margin-left: 5px;
+    width: 95%;
+    height: 140px;
+    margin-right: 5px;
+    background-color: #ffffff;
+    font-weight: bold;
+    border: solid 3px #000000;
+    text-align: center;
+}
+#list_icon{
+    font-size:140px;
+}
+
 .box5{
     height: 250px;
     width: 100%;

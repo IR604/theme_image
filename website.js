@@ -592,7 +592,7 @@ app.get("/us:akauntolink", (req, res) => {
     });
 
     // リスト情報
-    connection.query('SELECT * from lists where account_id=?',akauntolink ,function (error, results, fields){
+    connection.query('SELECT *, (CASE WHEN type="theme" THEN "article" WHEN type="image" THEN "image" END)AS icon from lists where account_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
             listinfo=results
         }
@@ -780,7 +780,6 @@ app.get("/follow", (req, res) => {
     });
     connection.end();
 });
-
 // フォロワー一覧
 app.get("/follower", (req, res) => {
     var user_id = req.query.id;
