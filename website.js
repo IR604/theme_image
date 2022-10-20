@@ -925,11 +925,14 @@ app.post('/comment',(req, res) => {
 
 // フォロー処理
 app.post('/follow',(req, res) => {
+    var follow_id = req.body.id;
+    var redirect_link = req.body.link;
     if(account_id==0){
         res.redirect('/login');
-    }else{
-        var follow_id = req.body.id;
-        var redirect_link = req.body.link;
+    }else if(account_id==follow_id){
+        res.redirect(redirect_link);
+    }
+    else{
         var data = {'account_id': account_id, 'follow_id':follow_id}
     
         var connection = mysql.createConnection(mysql_setting);
