@@ -16,8 +16,9 @@
         <div class="box1">
             <h1>通知一覧</h1>
         <ul>
-            <a href="#"><li>sub_accountさんがあなたのイラストをいいねしました。</li></a>
-            <a href="#"><li>sub_accountさんがあなたをフォローしました。</li></a>
+            <% for(var i in notification) { %>
+                <a href="<%-notification[i].typeM%><%-notification[i].contents_id%>"><li><%=notification[i].summary%></li></a>
+            <% } %>
         </ul>
         </div>
     </div>

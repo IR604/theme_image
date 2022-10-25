@@ -41,6 +41,7 @@ var { check, validationResult } = require('express-validator');
 // firebaseの設定
 const firebase = require('firebase/app')
 const firebase_auth = require('firebase/auth');
+const e = require('express');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
@@ -163,6 +164,36 @@ function menu_summary(){
     }
 }
 
+// アップロード用の通知
+function upload_mytheme(item_id, visited_id){
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    const bell='insert into notification set '
+    +'visiter_id='+account_id
+    +',visited_id='+visited_id
+    +',contents_id='+item_id
+    +',type="image",contents_post=false'
+    +', summary=(SELECT CONCAT(name, "さんがあなたのテーマで投稿しました。") FROM user_information where item_id='+account_id+')'
+    connection.query(bell, function (error, results, fields){
+    });
+    connection.end();
+}
+function upload_notification(item_id, title, type){
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    const bell='insert into notification set '
+    +'visiter_id='+account_id
+    +',visited_id=0'
+    +',contents_id='+item_id
+    +',type="'+type+'",contents_post=true'
+    +', summary=(SELECT CONCAT(name, "さんが「'+title+'」をアップロードしました。") FROM user_information where item_id='+account_id+')'
+    connection.query(bell, function (error, results, fields){
+    });
+    connection.end();
+}
+
 // ページ一覧
 // トップページ
 app.get("/", (req, res) => {
@@ -224,7 +255,6 @@ app.get("/enter_code", (req, res) => {
 app.get("/im:imagelink", (req, res) => {
     var imagelink = req.params.imagelink
     var msg = 'IR604'
-    var akauntolink = '/us1'
     var sametheme;
     var comments;
     var likejudge;
@@ -253,12 +283,20 @@ app.get("/im:imagelink", (req, res) => {
         });
     }
 
+    var user_id=0
+    connection.query('SELECT account_id from image where item_id= ?'
+    ,imagelink,function (error, results, fields){
+        if (error == null){
+            user_id=results[0].account_id;
+        }
+    });
     connection.query('SELECT * from likes where contents_id= ? and account_id= ?'
     ,[imagelink, account_id],function (error, results, fields){
         if (error == null){
             if(results[0]==null){
                 likejudge='<form action="/likes" method="post">'
                 +'<input type="hidden" name="id" value="'+imagelink+'">'
+                +'<input type="hidden" name="user_id" value="'+user_id+'">'
                 +'<input type="hidden" name="link" value="/im'+imagelink+'">'
                 +'<button type="submit" class="likebutton">'
                 +'<span class="material-symbols-outlined">grade</span>'
@@ -332,7 +370,6 @@ app.get("/im:imagelink", (req, res) => {
             }
             res.render('sample.ejs',
             {
-                akauntolink: akauntolink,
                 name: msg,
                 comments: comments,
                 imageinfo: results[0],
@@ -743,11 +780,26 @@ app.get("/research", (req, res) => {
 
 // 通知ページ
 app.get("/notification", (req, res) => {
-    res.render('notification.ejs',
-    {
-        header_icon: judge_function(),
-        header_menu:menu_summary()
-    });
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        const bell='SELECT *, (CASE WHEN type="theme" THEN "th" WHEN type="image" THEN "im" WHEN type="user" THEN "us" END)AS typeM from notification '
+        +'where (contents_post=false AND visited_id=?) '
+        +'OR (contents_post=true AND visiter_id IN (SELECT follow_id FROM follow where account_id=?)) '
+        +'ORDER BY item_id desc'
+        connection.query(bell, [account_id, account_id], function (error, results, fields){
+            res.render('notification.ejs',
+            {
+                notification:results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        });
+        connection.end();
+    }
 });
 
 // フォロー・フォロワー一覧
@@ -891,12 +943,13 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
         var theme = req.body.theme;
         var tag = req.body.tag;
         var data = {'contents':theme, 'tag':tag, 'account_id': account_id}
-
+        
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
         connection.query('insert into theme set ?', data, function (error, results, fields){
-            res.redirect('/');
+            upload_notification(results.insertId, theme, 'theme')
+            res.redirect('/tm'+results.insertId);
         });
         
         connection.end();
@@ -913,8 +966,18 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
+
+    var theme_account=0
+    connection.query('SELECT account_id FROM theme where item_id=?',theme_id, function (error, results, fields){
+        theme_account=results[0].account_id
+    });
+
     connection.query('insert into image set ?', data, function (error, results, fields){
-        res.redirect('/');
+        upload_notification(results.insertId, title, 'image', theme_id)
+        if(account_id!=theme_account){
+            upload_mytheme(results.insertId, theme_account)
+        }
+        res.redirect('/im'+results.insertId);
     });
 
     connection.end();
@@ -958,6 +1021,7 @@ app.post('/comment',(req, res) => {
         res.redirect('/login');
     }else{
         var summary = req.body.comment;
+        var user_id = req.body.user_id;
         var image_id = req.body.id;
         var redirect_link = req.body.link;
         var data = {'summary':summary, 'image_id':image_id, 'account_id': account_id}
@@ -965,6 +1029,17 @@ app.post('/comment',(req, res) => {
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
+        if(user_id!=account_id){
+            const bell='insert into notification set '
+            +'visiter_id='+account_id
+            +',visited_id=(SELECT account_id FROM image where item_id='+image_id
+            +'),contents_id='+image_id
+            +',type="image",contents_post=false'
+            +', summary=(SELECT CONCAT(name, "さんがあなたのイラストにコメントしました。") FROM user_information where item_id='+account_id+')'
+            connection.query(bell, function (error, results, fields){
+            });
+        }
+        
         connection.query('insert into comment set ?', data, function (error, results, fields){
             res.redirect(redirect_link);
         });
@@ -984,10 +1059,17 @@ app.post('/follow',(req, res) => {
     }
     else{
         var data = {'account_id': account_id, 'follow_id':follow_id}
-    
         var connection = mysql.createConnection(mysql_setting);
     
         connection.connect();
+        const bell='insert into notification set '
+        +'visiter_id='+account_id
+        +',visited_id='+follow_id
+        +',contents_id='+account_id
+        +',type="user",contents_post=false'
+        +', summary=(SELECT CONCAT(name, "さんがあなたをフォローしました。") FROM user_information where item_id='+account_id+')'
+        connection.query(bell, function (error, results, fields){
+        });
         connection.query('insert into follow set ?', data, function (error, results, fields){
             res.redirect(redirect_link);
         });
@@ -1016,12 +1098,25 @@ app.post('/likes',(req, res) => {
         res.redirect('/login');
     }else{
         var contents_id = req.body.id;
+        var user_id = req.body.user_id;
         var redirect_link = req.body.link;
+
         var data = {'contents_id': contents_id, 'account_id':account_id}
 
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
+        if(user_id!=account_id){
+            const bell='insert into notification set '
+            +'visiter_id='+account_id
+            +',visited_id=(SELECT account_id FROM image where item_id='+contents_id
+            +'),contents_id='+contents_id
+            +',type="image",contents_post=false'
+            +', summary=(SELECT CONCAT(name, "さんがあなたのイラストをいいねしました。") FROM user_information where item_id='+account_id+')'
+            connection.query(bell, function (error, results, fields){
+            });
+        }
+        
         connection.query('insert into likes set ?', data, function (error, results, fields){
             res.redirect(redirect_link);
         });
