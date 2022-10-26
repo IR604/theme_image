@@ -63,7 +63,6 @@ var { check, validationResult } = require('express-validator');
 // firebaseの設定
 const firebase = require('firebase/app')
 const firebase_auth = require('firebase/auth');
-const e = require('express');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
@@ -1245,6 +1244,25 @@ app.post('/setting_user',upload_header.single('header'),(req, res) => {
 app.post('/setting_password',(req, res) => {
     var email = req.body.email;
     var password = req.body.password;
+
+    const auth=firebase_auth.getAuth();
+
+    firebase_auth.updateEmail(auth.currentUser, email).then(() => {
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+    });
+
+    firebase_auth.updatePassword(auth.currentUser, password).then(() => {
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+    });
+    res.redirect('/setting_password');
 });
 var server = app.listen(3000, () => {
     console.log('Start server port:3000')
