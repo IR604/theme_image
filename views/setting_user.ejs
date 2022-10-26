@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>設定</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/setting.css">
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    <div class="boxB">
+        <div class="set-left">
+            <ul>
+                <a href="/setting_user"><li>ユーザー情報</li></a>
+                <a href="/setting_password"><li>メールアドレス・パスワード</li></a>
+            </ul>
+        </div>
+        <div class="set-right">
+            <h1>ユーザー情報</h1>
+            <form action="/setting_icon" method="post" enctype = "multipart/form-data">
+                <div class="icon_block">
+                    <div class="icon_left">
+                        <img src="images/icons/<%-userinfo.item_id%>.jpg" id="avatar" alt=""  width="150" height="150">
+                    </div>
+                    <div class="icon_right">
+                        <div class="icon_right_set1">
+                            <%=userinfo.name%>
+                        </div>
+                        <b>アイコン変更</b><br>
+                        <input type="file" name="icon"  accept="image/*">
+                        <div><input type="submit" class="submit-button" value="変更"></div>
+                    </div>
+                </div>
+            </form>
+            <form action="/setting_user" method="post" enctype = "multipart/form-data">
+                <input type="hidden" name="user_id" value="<%-userinfo.item_id%>">
+                <input type="hidden" name="uid" value="<%-userinfo.uid%>">
+                <h2>アカウント名変更</h2>
+                <div class="fields"><input type="text" class="inputfield" name="name" value="<%=userinfo.name%>" placeholder="新アカウント名"></div>
+                <h2>概要欄変更</h2>
+                <textarea name="summary" class="setting-summary" placeholder="概要"><%=userinfo.summary%></textarea>
+                <h2>ヘッダ画像変更</h2>
+                <input type="file" name="header"  accept="image/*">
+                <div class="setting_submit"><input type="submit" class="submit-button" value="更新"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="copyright">
+        コピーライト
+    </div>
+</body>
+</html>

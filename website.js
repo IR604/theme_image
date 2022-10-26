@@ -21,8 +21,30 @@ var storage = multer.diskStorage({
         cb(null, filename)
     }
 })
+var icon_storage = multer.diskStorage({
+    //ファイルの保存先を指定
+    destination: function(req, file, cb){
+        cb(null, './public/images/icons')
+    },
+    //ファイル名を指定
+    filename: function(req, file, cb){
+        cb(null, account_id+'.jpg')
+    }
+})
+var header_storage = multer.diskStorage({
+    //ファイルの保存先を指定
+    destination: function(req, file, cb){
+        cb(null, './public/images/header')
+    },
+    //ファイル名を指定
+    filename: function(req, file, cb){
+        cb(null, account_id+'.jpg')
+    }
+})
 
 var upload = multer({storage:storage})
+var upload_icon = multer({storage:icon_storage})
+var upload_header = multer({storage:header_storage})
 
 var mysql = require('mysql');
 
@@ -153,7 +175,7 @@ function menu_summary(){
         +'<li><span class="material-symbols-outlined">star</span>　いいね一覧</li>'
         +'</a>'
         +'<h2>設定</h2>'
-        +'<a href="#">'
+        +'<a href="/setting_user">'
         +'<li><span class="material-symbols-outlined">settings</span>　設定</li>'
         +'</a>'
         +'<a href="#">'
@@ -201,7 +223,6 @@ app.get("/", (req, res) => {
     var imagelink = '/image'
     var akauntolink = '/akaunto'
     var imageinfo;
-
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
@@ -862,8 +883,69 @@ app.get("/follower", (req, res) => {
     connection.end();
 });
 
+// 設定ページ
+app.get("/setting_user", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        connection.query('SELECT * from user_information where item_id=?',account_id ,function (error, results, fields){
+            if (error == null){
+                res.render('setting_user.ejs',
+                {
+                    userinfo: results[0],
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+        connection.end();
+    }
+});
+app.get("/setting_password", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        res.render('setting_password.ejs',
+        {
+            header_icon: judge_function(),
+            header_menu:menu_summary()
+        });
+    }
+});
+
 // ログイン処理
 app.post('/login', (req, res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+    
+    const auth=firebase_auth.getAuth();
+    firebase_auth.signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user.uid);
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect(); 
+        connection.query('SELECT item_id from user_information where uid = ?',user.uid,function (error, results, fields){
+            account_id=results[0].item_id
+            res.redirect('/');
+        });
+        connection.end();
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        res.redirect('/login');
+    });
+});
+
+app.post('/logout', (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
     
@@ -1139,6 +1221,31 @@ app.post('/deletelikes',(req, res) => {
     connection.end();
 });
 
+// 設定
+app.post('/setting_icon',upload_icon.single('icon'),(req, res) => {
+    res.redirect('/setting_user');
+});
+app.post('/setting_user',upload_header.single('header'),(req, res) => {
+    var user_id = req.body.user_id;
+    var name = req.body.name;
+    var summary = req.body.summary;
+    var uid = req.body.uid;
+    var data = {'name': name, 'summary':summary, 'uid': uid}
+    
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('update user_information set ? where item_id = ?', [data, user_id], function (error, results, fields){
+        res.redirect('/setting_user');
+    });
+
+    connection.end();
+});
+app.post('/setting_password',(req, res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+});
 var server = app.listen(3000, () => {
     console.log('Start server port:3000')
 });
