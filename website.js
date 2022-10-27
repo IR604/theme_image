@@ -177,9 +177,9 @@ function menu_summary(){
         +'<a href="/setting_user">'
         +'<li><span class="material-symbols-outlined">settings</span>　設定</li>'
         +'</a>'
-        +'<a href="#">'
-        +'<li><span class="material-symbols-outlined">logout</span>　ログアウト</li>'
-        +'</a>'
+        +'<form action="/logout" method="post">'
+        +'<li><button type="submit" class="logout_button"><span class="material-symbols-outlined">logout</span>　ログアウト</button></li>'
+        +'</form>'
         +'</ul>'
         return judge
     }
@@ -945,30 +945,20 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    var email = req.body.email;
-    var password = req.body.password;
-    
     const auth=firebase_auth.getAuth();
-    firebase_auth.signInWithEmailAndPassword(auth, email, password)
+    firebase_auth.signOut(auth)
     .then((userCredential) => {
         // Signed in
-        const user = userCredential.user;
-        console.log(user.uid);
-        var connection = mysql.createConnection(mysql_setting);
-
-        connection.connect(); 
-        connection.query('SELECT item_id from user_information where uid = ?',user.uid,function (error, results, fields){
-            account_id=results[0].item_id
-            res.redirect('/');
-        });
-        connection.end();
+        account_id=0
+        console.log('signout');
+        res.redirect('/login');
     })
     .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode);
         console.log(errorMessage);
-        res.redirect('/login');
+        res.redirect('/');
     });
 });
 

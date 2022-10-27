@@ -220,6 +220,16 @@ summary.menuber{
     font-weight: bold;
 }
 
+/*ログアウト*/
+.logout_button{
+    background: none;
+    border: none; /*枠線非表示*/
+    outline: none; /*フォーカス時の枠線非表示*/
+    color:#727272;
+    font-size: 19px;
+    padding:0px
+}
+
 /*コピーライト*/
 .copyright{
     height: 150px;
