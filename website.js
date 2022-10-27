@@ -882,6 +882,32 @@ app.get("/follower", (req, res) => {
     connection.end();
 });
 
+// 全コメント一覧
+app.get("/comments", (req, res) => {
+    var image_id = req.query.id;
+
+    var imageinfo
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * FROM image where item_id=?',image_id ,function (error, results, fields){
+        imageinfo=results[0]
+    });
+    connection.query('SELECT comment.*, user_information.name as name FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=?',image_id ,function (error, results, fields){
+        if (error == null){
+            res.render('comment.ejs',
+            {
+                imageinfo:imageinfo,
+                comments:results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+
 // 設定ページ
 app.get("/setting_user", (req, res) => {
     if(account_id==0){
@@ -943,7 +969,6 @@ app.post('/login', (req, res) => {
         res.redirect('/login');
     });
 });
-
 app.post('/logout', (req, res) => {
     const auth=firebase_auth.getAuth();
     firebase_auth.signOut(auth)
