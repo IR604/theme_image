@@ -540,15 +540,55 @@ app.get("/li:listlink", (req, res) => {
     });
     connection.end();
 });
-app.get("/theme_list", (req, res) => {
+// 話題のテーマ・イラスト
+app.get("/topic", (req, res) => {
+    var type=req.query.type
+
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from theme',function (error, results, fields){
+    if(type=='theme'){
+        connection.query('SELECT * from theme',function (error, results, fields){
+            if (error == null){
+                res.render('theme_list.ejs',
+                {
+                    title:'話題のテーマ',
+                    themeinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+    }else if(type=='image'){
+        connection.query('SELECT * from image',function (error, results, fields){
+            if (error == null){
+                res.render('image_list.ejs',
+                {
+                    title:'話題のイラスト',
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+    }else{
+        res.redirect('/');
+    }
+    connection.end();
+});
+// 各テーマで投稿されたイラスト
+app.get("/theme_image", (req, res) => {
+    var theme_id=req.query.id
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * from image where theme_id= ?',theme_id,function (error, results, fields){
         if (error == null){
-            res.render('theme_list.ejs',
+            res.render('image_list.ejs',
             {
-                themeinfo: results,
+                title:'投稿されたイラスト',
+                imageinfo: results,
                 header_icon: judge_function(),
                 header_menu:menu_summary()
             });
@@ -556,14 +596,18 @@ app.get("/theme_list", (req, res) => {
     });
     connection.end();
 });
-app.get("/illust_list", (req, res) => {
+// 同テーマのイラスト
+app.get("/same_image", (req, res) => {
+    var theme_id=req.query.id
+
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from image',function (error, results, fields){
-           if (error == null){
+    connection.query('SELECT * FROM image WHERE theme_id = ?',theme_id,function (error, results, fields){
+        if (error == null){
             res.render('image_list.ejs',
             {
+                title:'同テーマのイラスト',
                 imageinfo: results,
                 header_icon: judge_function(),
                 header_menu:menu_summary()

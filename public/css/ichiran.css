@@ -53,3 +53,38 @@
     height:50px;
     background:#ffee8f;
 }
+
+/*リスト*/
+.split_contents{
+    border-top: solid 2px #777777;
+    display: flex;
+    justify-content: center;
+}
+.split_contents ul	{margin: 0;
+    margin-top: 10px;
+	padding: 0;
+	list-style: none;
+}
+.split_contents ul a	{margin: 0;
+    padding: 0;
+    list-style: none;
+    color:#727272;
+    text-decoration: none
+}
+.split_contents ul:after{
+    content: "";
+    display: block;
+    clear: both;
+}
+.split_contents li{float:left;
+    padding: 5px 0px;
+    background-color: #ffffff;
+    font-size: 20px;
+    width: 60px;
+    height: 30px;
+    text-align: center;
+    border: solid 1px #777777;
+}
+.split_contents li:hover{
+    background-color: #f0f0f0;
+}
