@@ -7,106 +7,191 @@ var mysql_setting = {
     database: 'ir604'
 };
 
-function add_user(){
+function add_user(loop){
+     for(var i=0;i<loop;i++){
+          var data = {'name': 'name', 'summary':'sample', 'uid': 'XXX'}
+
+          var connection = mysql.createConnection(mysql_setting);
+          connection.connect(); 
+          connection.query('insert into user_information set ?', data, function (error, results, fields){
+          });
+          connection.end();
+     }
+}
+
+function add_theme(id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'contents':'sample', 'tag':'tag,sample', 'account_id': id}
+     
+          var connection = mysql.createConnection(mysql_setting);
+
+          connection.connect();
+          connection.query('insert into theme set ?', data, function (error, results, fields){
+          });
+          
+          connection.end();
+     }
+}
+
+function add_image(id, theme_id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'name':'nekogao.png', 'title':'sample', 'likes':1, 'contents':'sample', 'theme_id':theme_id,  'account_id': id}
+     
+          var connection = mysql.createConnection(mysql_setting);
+     
+          connection.connect();
+          connection.query('insert into image set ?', data, function (error, results, fields){
+          });
+     
+          connection.end();
+     }
+}
+
+function add_list(id, type, loop){
+     var connection = mysql.createConnection(mysql_setting);
+     connection.connect();
+     var lists_data = {'title':'sample', 'type':type, 'account_id': id}
+     connection.query('insert into lists set ?', lists_data, function (error, results, fields){
+          add_list_contents(results.insertId, loop)
+     })
+     connection.end();
+}
+function add_list_contents(id, loop){
+     var connection = mysql.createConnection(mysql_setting);
+     connection.connect();
+     for(var i=0;i<loop;i++){
+          var list_contents_data = {'list_id':id, 'contents_id':i+1}
+          connection.query('insert into list_contents set ?', list_contents_data, function (error, results, fields){
+          });
+     }
+     connection.end();
+}
+
+function add_comment(id, image_id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'summary':'sample', 'image_id':image_id, 'account_id': id}
+     
+          var connection = mysql.createConnection(mysql_setting);
+
+          connection.connect();
+          connection.query('insert into comment set ?', data, function (error, results, fields){
+          });
+
+          connection.end();
+     }
+}
+
+function add_likes(id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'contents_id': i+1, 'account_id':id}
+     
+          var connection = mysql.createConnection(mysql_setting);
+
+          connection.connect();
+          connection.query('insert into likes set ?', data, function (error, results, fields){
+          });
+
+          connection.end();
+     }
+}
+
+function add_follow(id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'account_id': id, 'follow_id':i+1}
+     
+          var connection = mysql.createConnection(mysql_setting);
+      
+          connection.connect();
+          connection.query('insert into follow set ?', data, function (error, results, fields){
+          });
+      
+          connection.end();
+     }
+}
+
+function add_notification(visit_id, contents_id, type, contents_post, loop){
+     summary="testさんがあなたのイラストにいいねしました。"
+     var connection = mysql.createConnection(mysql_setting);
+      
+     connection.connect();
+     for(var i=0;i<loop;i++){
+          var data = {'visiter_id': i+1, 'visited_id':visit_id, 'contents_id':contents_id, 'type':type, 'contents_post':contents_post,'summary':summary}
+          connection.query('insert into notification set ?', data, function (error, results, fields){
+          });
+     }
+     connection.end();
+}
+
+
+function public_user(){
      var data = {'name': 'name', 'summary':'sample', 'uid': 'XXX'}
 
      var connection = mysql.createConnection(mysql_setting);
      connection.connect(); 
      connection.query('insert into user_information set ?', data, function (error, results, fields){
-          res.redirect('/login');
+          add_theme(results.insertId, 3);
+          add_image(results.insertId, 1, 2);
+          add_list(results.insertId, 'theme', 3);
+          add_list(results.insertId, 'image', 3);
+          add_comment(results.insertId, 2, 4);
+          add_likes(results.insertId, 3);
+          add_follow(results.insertId, 2);
      });
      connection.end();
 }
 
-function add_theme(){
-     var data = {'contents':'sample', 'tag':'tag,sample', 'account_id': 3}
- 
+function all(id){
      var connection = mysql.createConnection(mysql_setting);
-
+      
      connection.connect();
-     connection.query('insert into theme set ?', data, function (error, results, fields){
-         res.redirect('/');
-     });
-     
-     connection.end();
-}
-
-function add_image(){
-     var data = {'name':'dummy', 'title':'sample', 'likes':0, 'contents':'sample', 'theme_id':3,  'account_id': 3}
- 
-     var connection = mysql.createConnection(mysql_setting);
- 
-     connection.connect();
-     connection.query('insert into image set ?', data, function (error, results, fields){
-         res.redirect('/');
-     });
- 
-     connection.end();
-}
-
-function add_list(){
-     var data = {'title':'sample', 'type':'theme', 'account_id': 3}
- 
-     var connection = mysql.createConnection(mysql_setting);
- 
-     connection.connect();
-     connection.query('insert into lists set ?', data, function (error, results, fields){
-         res.redirect('/us'+account_id);
-     });
-     connection.query('insert into list_contents set ?', data, function (error, results, fields){
-          res.redirect(link);
-     });
- 
-     connection.end();
-}
-
-function add_comment(){
-     var data = {'summary':'sample', 'image_id':5, 'account_id': 3}
- 
-     var connection = mysql.createConnection(mysql_setting);
-
-     connection.connect();
-     connection.query('insert into comment set ?', data, function (error, results, fields){
-         res.redirect(redirect_link);
-     });
-
-     connection.end();
-}
-
-function add_likes(){
-     var data = {'contents_id': 5, 'account_id':3}
- 
-     var connection = mysql.createConnection(mysql_setting);
-
-     connection.connect();
-     connection.query('insert into likes set ?', data, function (error, results, fields){
-          res.redirect(redirect_link);
-     });
-
-     connection.end();
-}
-
-function add_follow(){
-     var data = {'account_id': 3, 'follow_id':4}
-     
-     var connection = mysql.createConnection(mysql_setting);
- 
-     connection.connect();
-     connection.query('insert into follow set ?', data, function (error, results, fields){
-         res.redirect(redirect_link);
-     });
- 
-     connection.end();
-}
-
-function add_notification(){
-     console.log(1+1);
-}
-
-function all(){
-     for(var i = 0;i<10;i++){
-          console.log(1+1);
+     switch(id){
+          case 'user':
+               connection.query('SELECT * from user_information', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'theme':
+               connection.query('SELECT * from theme', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'image':
+               connection.query('SELECT * from image', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'lists':
+               connection.query('SELECT * from lists', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'list_contents':
+               connection.query('SELECT * from list_contents', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'comment':
+               connection.query('SELECT * from comment', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'likes':
+               connection.query('SELECT * from likes', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'follow':
+               connection.query('SELECT * from follow', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
+          case 'notification':
+               connection.query('SELECT * from notification', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
      }
+      
+     connection.end();
 }
-
-all();
+public_user()
