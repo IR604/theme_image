@@ -164,13 +164,13 @@ function menu_summary(){
         +'<li><span class="material-symbols-outlined">person</span>　マイページ</li>'
         +'</a>'
         +'<h2>コンテンツ</h2>'
-        +'<a href="#">'
+        +'<a href="/follow_theme">'
         +'<li><span class="material-symbols-outlined">article</span>　フォローユーザーのテーマ</li>'
         +'</a>'
-        +'<a href="#">'
+        +'<a href="/follow_image">'
         +'<li><span class="material-symbols-outlined">image</span>　フォローユーザーのイラスト</li>'
         +'</a>'
-        +'<a href="#">'
+        +'<a href="/likes">'
         +'<li><span class="material-symbols-outlined">star</span>　いいね一覧</li>'
         +'</a>'
         +'<h2>設定</h2>'
@@ -619,6 +619,69 @@ app.get("/same_image", (req, res) => {
         }
     });
     connection.end();
+});
+// 各ユーザーがいいねしたイラスト
+app.get("/likes", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var connection = mysql.createConnection(mysql_setting);
+        connection.connect();
+        connection.query('SELECT * FROM image WHERE item_id IN (SELECT contents_id FROM likes where account_id = ?)',account_id,function (error, results, fields){
+            if (error == null){
+                res.render('image_list.ejs',
+                {
+                    title:'いいねしたイラスト',
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+        connection.end();
+    }
+});
+// 各ユーザーがフォローしているユーザーのテーマ
+app.get("/follow_theme", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var connection = mysql.createConnection(mysql_setting);
+        connection.connect();
+        connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?)',account_id,function (error, results, fields){
+            if (error == null){
+                res.render('theme_list.ejs',
+                {
+                    title:'フォローしたユーザーのテーマ',
+                    themeinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+        connection.end();
+    }
+});
+// 各ユーザーがフォローしているユーザーのイラスト
+app.get("/follow_image", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login');
+    }else{
+        var connection = mysql.createConnection(mysql_setting);
+        connection.connect();
+        connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?)',account_id,function (error, results, fields){
+            if (error == null){
+                res.render('image_list.ejs',
+                {
+                    title:'フォローしたユーザーのイラスト',
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:menu_summary()
+                });
+            }
+        });
+        connection.end();
+    }
 });
 
 // アカウントページ
