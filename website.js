@@ -216,6 +216,10 @@ function upload_notification(item_id, title, type){
 }
 
 // ページ一覧
+app.all("*", (req, res, next) => {
+    next();
+});
+
 // トップページ
 app.get("/", (req, res) => {
     var msg = 'IR604'
@@ -497,7 +501,7 @@ app.get("/tm:themelink", (req, res) => {
 
 // 一覧ページ
 // リストに追加されたコンテンツ
-app.get("/li:listlink", (req, res) => {
+app.get("/list:listlink", (req, res) => {
     var listlink = req.params.listlink
     var connection = mysql.createConnection(mysql_setting);
 
@@ -913,6 +917,35 @@ app.get("/follower", (req, res) => {
 
     connection.query('SELECT * from user_information where item_id IN '
     +'(SELECT account_id FROM follow where follow_id= ?)',user_id ,function (error, results, fields){
+        if (error == null){
+            res.render('user_list.ejs',
+            {
+                title:title,
+                userinfo:results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+// いいねユーザー一覧
+app.get("/likes_user", (req, res) => {
+    var image_id = req.query.id;
+
+    var title=''
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT title from image where item_id=?',image_id ,function (error, results, fields){
+        if (error == null){
+            title=results[0].title+'をいいねしたユーザー'
+        }
+    });
+
+    connection.query('SELECT * from user_information where item_id IN '
+    +'(SELECT account_id FROM likes where contents_id= ?)',image_id ,function (error, results, fields){
         if (error == null){
             res.render('user_list.ejs',
             {

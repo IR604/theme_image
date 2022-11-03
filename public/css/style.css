@@ -223,6 +223,11 @@
 .share-gp   {background-color: #dd4b39}
 .share li a:hover   {opacity: 0.8}
 
+.likes_count{
+    text-decoration: none;
+    color:#000000
+}
+
 #star-font{
     color:#fded57;
     
