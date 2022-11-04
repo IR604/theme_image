@@ -140,6 +140,33 @@ function public_user(){
      connection.end();
 }
 
+function reset_user(){
+     var data1={'name': 'IR604', 'summary':'', 'uid': 'X3DzCttyDuY9KRaCnw3URBRnabT2'}
+     var data2={'name': 'sub_account', 'summary':'', 'uid': 'mmc38o3BMKYjBrMoG00s1iUteg32'}
+
+     var connection = mysql.createConnection(mysql_setting);
+     connection.connect(); 
+     connection.query('insert into user_information set ?', data1, function (error, results, fields){});
+     connection.query('insert into user_information set ?', data2, function (error, results, fields){});
+     connection.end();
+}
+function reset(){
+     var connection = mysql.createConnection(mysql_setting);
+     connection.connect(); 
+     connection.query('TRUNCATE TABLE user_information', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE theme', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE image', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE lists', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE list_contents', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE comment', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE likes', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE follow', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE notification', function (error, results, fields){
+          reset_user()
+     });
+     connection.end();
+}
+
 function all(id){
      var connection = mysql.createConnection(mysql_setting);
       
@@ -194,4 +221,5 @@ function all(id){
       
      connection.end();
 }
-public_user()
+
+all('theme')
