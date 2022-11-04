@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+const fs = require('fs');
 
 var mysql_setting = {
     host: 'localhost',
@@ -14,6 +15,23 @@ function add_user(loop){
           var connection = mysql.createConnection(mysql_setting);
           connection.connect(); 
           connection.query('insert into user_information set ?', data, function (error, results, fields){
+               fs.copyFile('./public/images/icons/default_icon.jpg', './public/images/icons/'+results.insertId+'.jpg', (err) => {
+                    if (err) {
+                        console.log(err.stack);
+                    }
+                    else {
+                        console.log('Done.');
+                    }
+                });
+    
+                fs.copyFile('./public/images/header/default_header.jpg', './public/images/header/'+results.insertId+'.jpg', (err) => {
+                    if (err) {
+                        console.log(err.stack);
+                    }
+                    else {
+                        console.log('Done.');
+                    }
+                });
           });
           connection.end();
      }
@@ -129,6 +147,23 @@ function public_user(){
      var connection = mysql.createConnection(mysql_setting);
      connection.connect(); 
      connection.query('insert into user_information set ?', data, function (error, results, fields){
+          fs.copyFile('./public/images/icons/default_icon.jpg', './public/images/icons/'+results.insertId+'.jpg', (err) => {
+               if (err) {
+                   console.log(err.stack);
+               }
+               else {
+                   console.log('Done.');
+               }
+           });
+
+           fs.copyFile('./public/images/header/default_header.jpg', './public/images/header/'+results.insertId+'.jpg', (err) => {
+               if (err) {
+                   console.log(err.stack);
+               }
+               else {
+                   console.log('Done.');
+               }
+           });
           add_theme(results.insertId, 3);
           add_image(results.insertId, 1, 2);
           add_list(results.insertId, 'theme', 3);
@@ -222,4 +257,4 @@ function all(id){
      connection.end();
 }
 
-all('theme')
+all('user')

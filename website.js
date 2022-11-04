@@ -1,5 +1,6 @@
 var express = require('express');
 var ejs = require("ejs");
+const fs = require('fs');
 var app = express();
 
 app.engine('ejs',ejs.renderFile);
@@ -1143,6 +1144,23 @@ app.post('/create_account', (req, res) => {
         var connection = mysql.createConnection(mysql_setting);
         connection.connect(); 
         connection.query('insert into user_information set ?', data, function (error, results, fields){
+            fs.copyFile('./public/images/icons/default_icon.jpg', './public/images/icons/'+results.insertId+'.jpg', (err) => {
+                if (err) {
+                    console.log(err.stack);
+                }
+                else {
+                    console.log('Done.');
+                }
+            });
+
+            fs.copyFile('./public/images/header/default_header.jpg', './public/images/header/'+results.insertId+'.jpg', (err) => {
+                if (err) {
+                    console.log(err.stack);
+                }
+                else {
+                    console.log('Done.');
+                }
+            });
             res.redirect('/login');
         });
         connection.end();
