@@ -84,10 +84,28 @@
         </div>
         <div class="box3">
             <div class="box3-1">
-                関連テーマ
+                <a href="connection_theme?id=<%-themeinfo.item_id%>">関連テーマ</a>
             </div>
             <div class="theme_box">
-                一覧
+                <% for(var i in connection_theme) { %>
+                    <div class="theme_ichiran">
+                        <a href="/tm<%=connection_theme[i].item_id%>">
+                            <div class="theme_top">
+                                <%=connection_theme[i].contents%>
+                            </div>
+                        </a>
+                        <a href="us<%-connection_theme[i].account_id%>">
+                            <div class="theme_bottom">
+                                <div class="theme_icon">
+                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </div>
+                                <div class="theme_name">
+                                    name
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>

@@ -296,6 +296,7 @@ app.get("/im:imagelink", (req, res) => {
     var imagelink = req.params.imagelink
     var msg = 'IR604'
     var sametheme;
+    var connection_image;
     var comments;
     var likejudge;
     var judgeresult = 0
@@ -387,6 +388,14 @@ app.get("/im:imagelink", (req, res) => {
         }
     });
 
+    // 関連イラスト
+    connection.query('SELECT * FROM image WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?)))'
+    ,imagelink ,function (error, results, fields){
+        if (error == null){
+            connection_image=results;
+        }
+    });
+
     connection.query('SELECT tag from tags where theme_id=(SELECT theme_id FROM image where item_id=?)'
     , imagelink,function (error, results, fields){
         if (error == null){
@@ -420,6 +429,7 @@ app.get("/im:imagelink", (req, res) => {
                 comments: comments,
                 imageinfo: results[0],
                 sametheme:sametheme,
+                connection_image:connection_image,
                 tag: tag,
                 judgement: judgement,
                 likejudge: likejudge,
@@ -439,6 +449,7 @@ app.get("/tm:themelink", (req, res) => {
     var msg = 'IR604'
     var akauntolink = '/us1'
     var imageinfo;
+    var connection_theme;
     var judgeresult = 0
     var follow_id = 0
     var tag=''
@@ -484,6 +495,14 @@ app.get("/tm:themelink", (req, res) => {
         }
     });
 
+    // 関連テーマ
+    connection.query('SELECT * from theme where item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?))'
+    , themelink,function (error, results, fields){
+        if (error == null){
+            connection_theme=results
+        }
+    });
+
     connection.query('SELECT tag from tags where theme_id= ?'
     , themelink,function (error, results, fields){
         if (error == null){
@@ -516,6 +535,7 @@ app.get("/tm:themelink", (req, res) => {
                 name: msg,
                 themeinfo: results[0],
                 imageinfo: imageinfo,
+                connection_theme: connection_theme,
                 tag: tag,
                 judgement: judgement,
                 list_add: list_add,
@@ -710,6 +730,46 @@ app.get("/follow_image", (req, res) => {
         });
         connection.end();
     }
+});
+// 関連テーマ
+app.get("/connection_theme", (req, res) => {
+    var theme_id=req.query.id
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * from theme where item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?))',theme_id,function (error, results, fields){
+        if (error == null){
+            res.render('theme_list.ejs',
+            {
+                title:'関連テーマ',
+                themeinfo: results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
+});
+// 関連イラスト
+app.get("/connection_image", (req, res) => {
+    var image_id=req.query.id
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT * FROM image WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?)))',image_id,function (error, results, fields){
+        if (error == null){
+            res.render('image_list.ejs',
+            {
+                title:'関連イラスト',
+                imageinfo: results,
+                header_icon: judge_function(),
+                header_menu:menu_summary()
+            });
+        }
+    });
+    connection.end();
 });
 
 // アカウントページ

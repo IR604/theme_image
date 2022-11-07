@@ -156,10 +156,30 @@
         </div>
         <div class="box9">
             <div class="box9-1">
-                関連イラスト
+                <a href="connection_image?id=<%-imageinfo.item_id%>">関連イラスト</a>
             </div>
             <div class="image_box">
-                一覧
+                <% for(var i in connection_image) { %>
+                    <div class="image_ichiran">
+                        <a href="im<%-connection_image[i].item_id%>">
+                            <div class="image_top">
+                            </div>
+                            <div class="image_top2">
+                                <%-connection_image[i].title%>
+                            </div>
+                        </a>
+                        <a href="us<%-connection_image[i].account_id%>">
+                            <div class="theme_bottom">
+                                <div class="theme_icon">
+                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                </div>
+                                <div class="theme_name">
+                                    name
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
