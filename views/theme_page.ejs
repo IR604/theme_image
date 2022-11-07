@@ -39,7 +39,7 @@
         <div class="box2">
             <ul>
                 <% for(var i in tag) { %>
-                    <li><a href="/research?search=<%- tag[i] %>"><%= tag[i] %></a></li>
+                    <li><a href="/research?search=<%- tag[i].tag %>"><%= tag[i].tag %></a></li>
                 <% } %>
             </ul>
         </div>

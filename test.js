@@ -45,6 +45,21 @@ function add_theme(id, loop){
 
           connection.connect();
           connection.query('insert into theme set ?', data, function (error, results, fields){
+               add_tag(results.insertId, 'tag,sample')
+          });
+          
+          connection.end();
+     }
+}
+function add_tag(id, tag){
+     var tagArr = tag.split(',');
+     for(var i in tagArr){
+          var data = {'tag':tagArr[i], 'theme_id': id}
+     
+          var connection = mysql.createConnection(mysql_setting);
+
+          connection.connect();
+          connection.query('insert into tags set ?', data, function (error, results, fields){
           });
           
           connection.end();
@@ -190,6 +205,7 @@ function reset(){
      connection.connect(); 
      connection.query('TRUNCATE TABLE user_information', function (error, results, fields){});
      connection.query('TRUNCATE TABLE theme', function (error, results, fields){});
+     connection.query('TRUNCATE TABLE tags', function (error, results, fields){});
      connection.query('TRUNCATE TABLE image', function (error, results, fields){});
      connection.query('TRUNCATE TABLE lists', function (error, results, fields){});
      connection.query('TRUNCATE TABLE list_contents', function (error, results, fields){});
@@ -252,9 +268,14 @@ function all(id){
                     console.log(results)
                });
                break;
+          case 'tags':
+               connection.query('SELECT * from tags', function (error, results, fields){
+                    console.log(results)
+               });
+               break;
      }
       
      connection.end();
 }
 
-all('user')
+all('tags')

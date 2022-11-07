@@ -216,6 +216,21 @@ function upload_notification(item_id, title, type){
     connection.end();
 }
 
+// タグ
+function insert_tag(id, tag){
+    var tagArr = tag.split(',');
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    for(var i in tagArr){
+        var data = {'tag':tagArr[i], 'theme_id': id}
+        connection.query('insert into tags set ?', data, function (error, results, fields){
+        });        
+    }
+    connection.end();
+}
+
 // ページ一覧
 app.all("*", (req, res, next) => {
     next();
@@ -286,6 +301,7 @@ app.get("/im:imagelink", (req, res) => {
     var judgeresult = 0
     var follow_id = 0
     var like;
+    var tag=''
 
     var connection = mysql.createConnection(mysql_setting);
     
@@ -371,12 +387,17 @@ app.get("/im:imagelink", (req, res) => {
         }
     });
 
-    connection.query('SELECT image.*, theme.contents as c2, theme.tag as tag, user_information.name as username from image INNER JOIN theme ON image.theme_id=theme.item_id INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
+    connection.query('SELECT tag from tags where theme_id=(SELECT theme_id FROM image where item_id=?)'
+    , imagelink,function (error, results, fields){
+        if (error == null){
+            tag=results
+        }
+    });
+
+    connection.query('SELECT image.*, theme.contents as c2, user_information.name as username from image INNER JOIN theme ON image.theme_id=theme.item_id INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
     imagelink ,function (error, results, fields){
         if (error == null){
             var judgement
-            var tag = results[0].tag;
-            var tagArr = tag.split(',');
 
             if (results[0].account_id==account_id){
                 judgement='';
@@ -399,7 +420,7 @@ app.get("/im:imagelink", (req, res) => {
                 comments: comments,
                 imageinfo: results[0],
                 sametheme:sametheme,
-                tag: tagArr,
+                tag: tag,
                 judgement: judgement,
                 likejudge: likejudge,
                 like:like,
@@ -420,6 +441,7 @@ app.get("/tm:themelink", (req, res) => {
     var imageinfo;
     var judgeresult = 0
     var follow_id = 0
+    var tag=''
 
     var connection = mysql.createConnection(mysql_setting);
 
@@ -462,11 +484,16 @@ app.get("/tm:themelink", (req, res) => {
         }
     });
 
+    connection.query('SELECT tag from tags where theme_id= ?'
+    , themelink,function (error, results, fields){
+        if (error == null){
+            tag=results
+        }
+    });
+
     connection.query('SELECT theme.*, user_information.name as username from theme INNER JOIN user_information ON theme.account_id=user_information.item_id where theme.item_id=?',themelink ,function (error, results, fields){
         if (error == null){
             var judgement
-            var tag = results[0].tag;
-            var tagArr = tag.split(',');
             
             if (results[0].account_id==account_id){
                 judgement='';
@@ -489,7 +516,7 @@ app.get("/tm:themelink", (req, res) => {
                 name: msg,
                 themeinfo: results[0],
                 imageinfo: imageinfo,
-                tag: tagArr,
+                tag: tag,
                 judgement: judgement,
                 list_add: list_add,
                 header_icon: judge_function(),
@@ -1202,6 +1229,7 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 
         connection.connect();
         connection.query('insert into theme set ?', data, function (error, results, fields){
+            insert_tag(results.insertId, tag)
             upload_notification(results.insertId, theme, 'theme')
             res.redirect('/tm'+results.insertId);
         });
