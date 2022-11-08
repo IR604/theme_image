@@ -245,12 +245,17 @@ app.get("/", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from image',function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             imageinfo = results
         }
     });
-    connection.query('SELECT * from theme',function (error, results, fields){
+    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+    +'FROM theme INNER JOIN '
+    +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+    +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             res.render('index.ejs',
             {
@@ -365,6 +370,8 @@ app.get("/im:imagelink", (req, res) => {
             }
         }
     });
+
+    // フォローボタン
     connection.query('SELECT follow.* from follow INNER JOIN image ON follow.follow_id=image.account_id where follow.account_id= ? and image.item_id= ?'
     , [account_id, imagelink],function (error, results, fields){
         if (error == null){
@@ -377,19 +384,25 @@ app.get("/im:imagelink", (req, res) => {
         }
     });
 
-    connection.query('SELECT *, comment.summary as su1 FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=?',imagelink ,function (error, results, fields){
+    // コメント
+    connection.query('SELECT *, comment.summary as su1 FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=? ORDER BY comment.item_id desc',imagelink ,function (error, results, fields){
         if (error == null){
             comments=results;
         }
     });
-    connection.query('SELECT * FROM image WHERE theme_id = (SELECT theme_id FROM image WHERE item_id= ?);',imagelink ,function (error, results, fields){
+
+    // 同テーマのイラスト
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id = (SELECT theme_id FROM image WHERE item_id= ?) GROUP BY item_id ORDER BY likes desc',imagelink ,function (error, results, fields){
         if (error == null){
             sametheme=results;
         }
     });
 
     // 関連イラスト
-    connection.query('SELECT * FROM image WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?)))'
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN '
+    +'(SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
     ,imagelink ,function (error, results, fields){
         if (error == null){
             connection_image=results;
@@ -488,7 +501,8 @@ app.get("/tm:themelink", (req, res) => {
         }
     });
     
-    connection.query('SELECT * from image where theme_id= ?'
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id where theme_id= ? GROUP BY item_id ORDER BY likes desc'
     , themelink,function (error, results, fields){
         if (error == null){
             imageinfo=results
@@ -496,7 +510,12 @@ app.get("/tm:themelink", (req, res) => {
     });
 
     // 関連テーマ
-    connection.query('SELECT * from theme where item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?))'
+    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+    +'FROM theme INNER JOIN '
+    +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+    +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
+    +'GROUP BY theme.item_id ORDER BY likes desc'
     , themelink,function (error, results, fields){
         if (error == null){
             connection_theme=results
@@ -597,10 +616,13 @@ app.get("/topic", (req, res) => {
     var type=req.query.type
 
     var connection = mysql.createConnection(mysql_setting);
-
     connection.connect();
     if(type=='theme'){
-        connection.query('SELECT * from theme',function (error, results, fields){
+        connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+        +'FROM theme INNER JOIN '
+        +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+        +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+        +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('theme_list.ejs',
                 {
@@ -612,7 +634,8 @@ app.get("/topic", (req, res) => {
             }
         });
     }else if(type=='image'){
-        connection.query('SELECT * from image',function (error, results, fields){
+        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+        +'from image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
@@ -635,7 +658,8 @@ app.get("/theme_image", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from image where theme_id= ?',theme_id,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id where theme_id= ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
             res.render('image_list.ejs',
             {
@@ -655,7 +679,8 @@ app.get("/same_image", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * FROM image WHERE theme_id = ?',theme_id,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id = ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
             res.render('image_list.ejs',
             {
@@ -675,7 +700,8 @@ app.get("/likes", (req, res) => {
     }else{
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
-        connection.query('SELECT * FROM image WHERE item_id IN (SELECT contents_id FROM likes where account_id = ?)',account_id,function (error, results, fields){
+        connection.query('SELECT image.*, likes.item_id AS "likes_id" '
+        +'FROM image INNER JOIN likes ON image.item_id=likes.contents_id WHERE likes.account_id = ? ORDER BY likes_id desc',account_id,function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
@@ -696,7 +722,7 @@ app.get("/follow_theme", (req, res) => {
     }else{
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
-        connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?)',account_id,function (error, results, fields){
+        connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
             if (error == null){
                 res.render('theme_list.ejs',
                 {
@@ -717,7 +743,7 @@ app.get("/follow_image", (req, res) => {
     }else{
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
-        connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?)',account_id,function (error, results, fields){
+        connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
@@ -738,7 +764,12 @@ app.get("/connection_theme", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * from theme where item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?))',theme_id,function (error, results, fields){
+    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+    +'FROM theme INNER JOIN '
+    +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+    +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
+    +'GROUP BY theme.item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
             res.render('theme_list.ejs',
             {
@@ -758,7 +789,10 @@ app.get("/connection_image", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT * FROM image WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?)))',image_id,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN '
+    +'(SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
+    ,image_id,function (error, results, fields){
         if (error == null){
             res.render('image_list.ejs',
             {
@@ -848,19 +882,19 @@ app.get("/us:akauntolink", (req, res) => {
     });
 
     // リスト情報
-    connection.query('SELECT *, (CASE WHEN type="theme" THEN "article" WHEN type="image" THEN "image" END)AS icon from lists where account_id=?',akauntolink ,function (error, results, fields){
+    connection.query('SELECT *, (CASE WHEN type="theme" THEN "article" WHEN type="image" THEN "image" END)AS icon from lists where account_id=? ORDER BY item_id desc',akauntolink ,function (error, results, fields){
         if (error == null){
             listinfo=results
         }
     });
     // テーマ情報
-    connection.query('SELECT * from theme where account_id=?',akauntolink ,function (error, results, fields){
+    connection.query('SELECT * from theme where account_id=? ORDER BY item_id desc',akauntolink ,function (error, results, fields){
         if (error == null){
             themeinfo=results
         }
     });
     // イラスト情報
-    connection.query('SELECT * from image where account_id=?',akauntolink ,function (error, results, fields){
+    connection.query('SELECT * from image where account_id=? ORDER BY item_id desc',akauntolink ,function (error, results, fields){
         if (error == null){
             imageinfo=results
         }
@@ -1037,8 +1071,8 @@ app.get("/follow", (req, res) => {
         }
     });
 
-    connection.query('SELECT * from user_information where item_id IN '
-    +'(SELECT follow_id FROM follow where account_id= ?)',user_id ,function (error, results, fields){
+    connection.query('SELECT user_information.*, follow.item_id AS "follow" from user_information INNER JOIN follow ON user_information.item_id=follow.follow_id '
+    +'where account_id=? ORDER BY follow desc',user_id ,function (error, results, fields){
         if (error == null){
             res.render('user_list.ejs',
             {
@@ -1065,9 +1099,9 @@ app.get("/follower", (req, res) => {
             title=results[0].name+'をフォローしたユーザー'
         }
     });
-
-    connection.query('SELECT * from user_information where item_id IN '
-    +'(SELECT account_id FROM follow where follow_id= ?)',user_id ,function (error, results, fields){
+    
+    connection.query('SELECT user_information.*, follow.item_id AS "follow" from user_information INNER JOIN follow ON user_information.item_id=follow.account_id '
+    +'where follow_id=? ORDER BY follow desc',user_id ,function (error, results, fields){
         if (error == null){
             res.render('user_list.ejs',
             {
@@ -1095,8 +1129,8 @@ app.get("/likes_user", (req, res) => {
         }
     });
 
-    connection.query('SELECT * from user_information where item_id IN '
-    +'(SELECT account_id FROM likes where contents_id= ?)',image_id ,function (error, results, fields){
+    connection.query('SELECT user_information.*, likes.item_id AS "likes_item_id" from user_information INNER JOIN likes ON user_information.item_id=likes.account_id '
+    +'where contents_id=? ORDER BY likes_item_id desc',image_id ,function (error, results, fields){
         if (error == null){
             res.render('user_list.ejs',
             {
@@ -1122,7 +1156,7 @@ app.get("/comments", (req, res) => {
     connection.query('SELECT * FROM image where item_id=?',image_id ,function (error, results, fields){
         imageinfo=results[0]
     });
-    connection.query('SELECT comment.*, user_information.name as name FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=?',image_id ,function (error, results, fields){
+    connection.query('SELECT comment.*, user_information.name as name FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=? ORDER BY item_id desc',image_id ,function (error, results, fields){
         if (error == null){
             res.render('comment.ejs',
             {

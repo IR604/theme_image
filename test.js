@@ -128,9 +128,36 @@ function add_likes(id, loop){
      }
 }
 
+function increase_likes(id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'contents_id': id, 'account_id':i+1}
+     
+          var connection = mysql.createConnection(mysql_setting);
+
+          connection.connect();
+          connection.query('insert into likes set ?', data, function (error, results, fields){
+          });
+
+          connection.end();
+     }
+}
+
 function add_follow(id, loop){
      for(var i=0;i<loop;i++){
           var data = {'account_id': id, 'follow_id':i+1}
+     
+          var connection = mysql.createConnection(mysql_setting);
+      
+          connection.connect();
+          connection.query('insert into follow set ?', data, function (error, results, fields){
+          });
+      
+          connection.end();
+     }
+}
+function increase_follow(id, loop){
+     for(var i=0;i<loop;i++){
+          var data = {'account_id': i+1, 'follow_id':id}
      
           var connection = mysql.createConnection(mysql_setting);
       
