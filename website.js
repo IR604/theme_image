@@ -87,105 +87,6 @@ function judge_function() {
     return judge;
 }
 
-// メニューの表示内容を設置
-var menu_follow
-var menu_follower
-var menu_name
-function menu_db(){
-    var connection = mysql.createConnection(mysql_setting);
-    connection.connect();
-    follow_connect='SELECT X.account_id, '
-    +'SUM(CASE X.kbn WHEN "follow" THEN X.cnt ELSE 0 END) AS follow,'
-    +'SUM(CASE X.kbn WHEN "follower" THEN X.cnt ELSE 0 END) AS follower '
-    +'FROM'
-    +'(SELECT "follow" AS kbn, fl.account_id AS account_id, count(fl.follow_id) AS cnt '
-    +'FROM follow fl '
-    +'GROUP BY fl.account_id '
-    +'UNION ALL '
-    +'SELECT "follower" AS kbn, flw.follow_id AS account_id, count(flw.account_id) AS cnt '
-    +'FROM follow flw '
-    +'GROUP BY flw.follow_id'
-    +') X '
-    +'GROUP BY X.account_id '
-    +'HAVING X.account_id= ?'
-    connection.query(follow_connect,account_id ,function (error, results, fields){
-        if (error == null){
-            if(results[0]==null){
-                menu_follow=0;
-                menu_follower=0;
-            }else{
-                menu_follow=results[0].follow
-                menu_follower=results[0].follower
-            }
-        }
-    });
-    connection.query('SELECT name from user_information where item_id=?',account_id ,function (error, results, fields){
-        if (error == null){
-            menu_name=results[0].name;
-        }
-    });
-    connection.end();
-}
-function menu_summary(){
-    var judge
-    if(account_id==0){
-        judge='<ul>'
-        +'<h2>ページ</h2>'
-        +'<a href="/">'
-        +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
-        +'</a>'
-        +'<h2>設定</h2>'
-        +'<a href="/login">'
-        +'<li><span class="material-symbols-outlined">login</span>　ログイン</li>'
-        +'</a>'
-        +'</ul>'
-        return judge
-    }else{
-        menu_db()
-        judge='<div class="menu_user">'
-        +'<div class="menu_icon">'
-        +'<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="100" height="100">'
-        +'</div>'
-        +'<div class="menu_right">'
-        +'<div class="menu_name">'
-        +menu_name
-        +'</div>'
-        +'<div class="menu_follow">'
-        +'<a href="/follow?id='+account_id+'" class="followlink">フォロー：'+menu_follow+'</a><br>'
-        +'<a href="/follower?id='+account_id+'" class="followlink">フォロワー：'+menu_follower
-        +'</a></div>'
-        +'</div>'
-        +'</div>'
-        +'<h2>ページ</h2>'
-        +'<ul>'
-        +'<a href="/">'
-        +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
-        +'</a>'
-        +'<a href="/us'+account_id+'">'
-        +'<li><span class="material-symbols-outlined">person</span>　マイページ</li>'
-        +'</a>'
-        +'<h2>コンテンツ</h2>'
-        +'<a href="/follow_theme">'
-        +'<li><span class="material-symbols-outlined">article</span>　フォローユーザーのテーマ</li>'
-        +'</a>'
-        +'<a href="/follow_image">'
-        +'<li><span class="material-symbols-outlined">image</span>　フォローユーザーのイラスト</li>'
-        +'</a>'
-        +'<a href="/likes">'
-        +'<li><span class="material-symbols-outlined">star</span>　いいね一覧</li>'
-        +'</a>'
-        +'<h2>設定</h2>'
-        +'<a href="/setting_user">'
-        +'<li><span class="material-symbols-outlined">settings</span>　設定</li>'
-        +'</a>'
-        +'<form action="/logout" method="post">'
-        +'<li><button type="submit" class="logout_button"><span class="material-symbols-outlined">logout</span>　ログアウト</button></li>'
-        +'</form>'
-        +'</ul>'
-        return judge
-    }
-}
-
 // アップロード用の通知
 function upload_mytheme(item_id, visited_id){
     var connection = mysql.createConnection(mysql_setting);
@@ -232,7 +133,95 @@ function insert_tag(id, tag){
 }
 
 // ページ一覧
+var sidemenu=''
 app.all("*", (req, res, next) => {
+    // メニュー
+    var connection = mysql.createConnection(mysql_setting);
+    connection.connect();
+    if(account_id==0){
+        sidemenu='<ul>'
+        +'<h2>ページ</h2>'
+        +'<a href="/">'
+        +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
+        +'</a>'
+        +'<h2>設定</h2>'
+        +'<a href="/login">'
+        +'<li><span class="material-symbols-outlined">login</span>　ログイン</li>'
+        +'</a>'
+        +'</ul>'
+    }else{
+        var follow=0
+        var follower=0
+        
+        const follow_connect='SELECT X.account_id, '
+        +'SUM(CASE X.kbn WHEN "follow" THEN X.cnt ELSE 0 END) AS follow,'
+        +'SUM(CASE X.kbn WHEN "follower" THEN X.cnt ELSE 0 END) AS follower '
+        +'FROM'
+        +'(SELECT "follow" AS kbn, fl.account_id AS account_id, count(fl.follow_id) AS cnt '
+        +'FROM follow fl '
+        +'GROUP BY fl.account_id '
+        +'UNION ALL '
+        +'SELECT "follower" AS kbn, flw.follow_id AS account_id, count(flw.account_id) AS cnt '
+        +'FROM follow flw '
+        +'GROUP BY flw.follow_id'
+        +') X '
+        +'GROUP BY X.account_id '
+        +'HAVING X.account_id= ?'
+        connection.query(follow_connect,account_id ,function (error, results, fields){
+            if (error == null){
+                if(results[0]==null){
+                    follow=0;
+                    follower=0;
+                }else{
+                    follow=results[0].follow
+                    follower=results[0].follower
+                }
+            }
+        });
+        connection.query('SELECT name from user_information where item_id=?',account_id ,function (error, results, fields){
+            sidemenu='<div class="menu_user">'
+            +'<div class="menu_icon">'
+            +'<img src="images/icons/'+account_id+'.jpg"  id="avatar" alt=""  width="100" height="100">'
+            +'</div>'
+            +'<div class="menu_right">'
+            +'<div class="menu_name">'
+            +results[0].name
+            +'</div>'
+            +'<div class="menu_follow">'
+            +'<a href="/follow?id='+account_id+'" class="followlink">フォロー：'+follow+'</a><br>'
+            +'<a href="/follower?id='+account_id+'" class="followlink">フォロワー：'+follower
+            +'</a></div>'
+            +'</div>'
+            +'</div>'
+            +'<h2>ページ</h2>'
+            +'<ul>'
+            +'<a href="/">'
+            +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
+            +'</a>'
+            +'<a href="/us'+account_id+'">'
+            +'<li><span class="material-symbols-outlined">person</span>　マイページ</li>'
+            +'</a>'
+            +'<h2>コンテンツ</h2>'
+            +'<a href="/follow_content?type=theme">'
+            +'<li><span class="material-symbols-outlined">article</span>　フォローユーザーのテーマ</li>'
+            +'</a>'
+            +'<a href="/follow_content?type=image">'
+            +'<li><span class="material-symbols-outlined">image</span>　フォローユーザーのイラスト</li>'
+            +'</a>'
+            +'<a href="/likes">'
+            +'<li><span class="material-symbols-outlined">star</span>　いいね一覧</li>'
+            +'</a>'
+            +'<h2>設定</h2>'
+            +'<a href="/setting_user">'
+            +'<li><span class="material-symbols-outlined">settings</span>　設定</li>'
+            +'</a>'
+            +'<form action="/logout" method="post">'
+            +'<li><button type="submit" class="logout_button"><span class="material-symbols-outlined">logout</span>　ログアウト</button></li>'
+            +'</form>'
+            +'</ul>'
+        });
+    }
+    connection.end();
     next();
 });
 
@@ -252,7 +241,7 @@ app.get("/", (req, res) => {
         }
     });
     connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
-    +'FROM theme INNER JOIN '
+    +'FROM theme LEFT JOIN '
     +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
     +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
     +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
@@ -266,7 +255,7 @@ app.get("/", (req, res) => {
                 imagelink: imagelink,
                 akauntolink: akauntolink,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -449,7 +438,7 @@ app.get("/im:imagelink", (req, res) => {
                 like:like,
                 list_add: list_add,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -511,7 +500,7 @@ app.get("/tm:themelink", (req, res) => {
 
     // 関連テーマ
     connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
-    +'FROM theme INNER JOIN '
+    +'FROM theme LEFT JOIN '
     +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
     +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
     +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
@@ -559,7 +548,7 @@ app.get("/tm:themelink", (req, res) => {
                 judgement: judgement,
                 list_add: list_add,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -583,7 +572,8 @@ app.get("/list:listlink", (req, res) => {
     });
 
     
-    connection.query('SELECT * FROM theme where item_id IN (SELECT contents_id from list_contents where list_id=?)',listlink,function (error, results, fields){
+    connection.query('SELECT theme.*, list_contents.item_id AS list_id FROM theme INNER JOIN list_contents ON theme.item_id=list_contents.contents_id '
+    +'where list_contents.list_id=? ORDER BY list_id desc',listlink,function (error, results, fields){
         if (error == null){
             if(judge=='theme'){
                 res.render('theme_list.ejs',
@@ -591,12 +581,13 @@ app.get("/list:listlink", (req, res) => {
                     title: title,
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         }
     });
-    connection.query('SELECT * FROM image where item_id IN (SELECT contents_id from list_contents where list_id=?)',listlink,function (error, results, fields){
+    connection.query('SELECT image.*, list_contents.item_id AS list_id FROM image INNER JOIN list_contents ON image.item_id=list_contents.contents_id '
+    +'where list_contents.list_id=? ORDER BY list_id desc',listlink,function (error, results, fields){
         if (error == null){
             if(judge=='image'){
                 res.render('image_list.ejs',
@@ -604,7 +595,7 @@ app.get("/list:listlink", (req, res) => {
                     title: title,
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         }
@@ -619,7 +610,7 @@ app.get("/topic", (req, res) => {
     connection.connect();
     if(type=='theme'){
         connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
-        +'FROM theme INNER JOIN '
+        +'FROM theme LEFT JOIN '
         +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
         +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
         +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
@@ -629,7 +620,7 @@ app.get("/topic", (req, res) => {
                     title:'話題のテーマ',
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
@@ -642,7 +633,7 @@ app.get("/topic", (req, res) => {
                     title:'話題のイラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
@@ -666,7 +657,7 @@ app.get("/theme_image", (req, res) => {
                 title:'投稿されたイラスト',
                 imageinfo: results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -687,7 +678,7 @@ app.get("/same_image", (req, res) => {
                 title:'同テーマのイラスト',
                 imageinfo: results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -708,101 +699,91 @@ app.get("/likes", (req, res) => {
                     title:'いいねしたイラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
         connection.end();
     }
 });
-// 各ユーザーがフォローしているユーザーのテーマ
-app.get("/follow_theme", (req, res) => {
+// 各ユーザーがフォローしているユーザーのテーマ・イラスト
+app.get("/follow_content", (req, res) => {
     if(account_id==0){
         res.redirect('/login');
     }else{
+        var type=req.query.type
+
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
-        connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+        if(type=='theme'){
+            connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+                if (error == null){
+                    res.render('theme_list.ejs',
+                    {
+                        title:'フォローしたユーザーのテーマ',
+                        themeinfo: results,
+                        header_icon: judge_function(),
+                        header_menu:sidemenu
+                    });
+                }
+            });
+        }else if(type=='image'){
+            connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+                if (error == null){
+                    res.render('image_list.ejs',
+                    {
+                        title:'フォローしたユーザーのイラスト',
+                        imageinfo: results,
+                        header_icon: judge_function(),
+                        header_menu:sidemenu
+                    });
+                }
+            });
+        }
+        connection.end();
+    }
+});
+// 関連テーマ・イラスト
+app.get("/connection", (req, res) => {
+    var id=req.query.id
+    var type=req.query.type
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    if(type=='theme'){
+        connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+        +'FROM theme LEFT JOIN '
+        +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+        +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+        +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
+        +'GROUP BY theme.item_id ORDER BY likes desc',id,function (error, results, fields){
             if (error == null){
                 res.render('theme_list.ejs',
                 {
-                    title:'フォローしたユーザーのテーマ',
+                    title:'関連テーマ',
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
-        connection.end();
-    }
-});
-// 各ユーザーがフォローしているユーザーのイラスト
-app.get("/follow_image", (req, res) => {
-    if(account_id==0){
-        res.redirect('/login');
-    }else{
-        var connection = mysql.createConnection(mysql_setting);
-        connection.connect();
-        connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+    }else if(type=='image'){
+        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+        +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN '
+        +'(SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
+        ,id,function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
-                    title:'フォローしたユーザーのイラスト',
+                    title:'関連イラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
-        connection.end();
     }
-});
-// 関連テーマ
-app.get("/connection_theme", (req, res) => {
-    var theme_id=req.query.id
-
-    var connection = mysql.createConnection(mysql_setting);
-
-    connection.connect();
-    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
-    +'FROM theme INNER JOIN '
-    +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
-    +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
-    +'GROUP BY theme.item_id ORDER BY likes desc',theme_id,function (error, results, fields){
-        if (error == null){
-            res.render('theme_list.ejs',
-            {
-                title:'関連テーマ',
-                themeinfo: results,
-                header_icon: judge_function(),
-                header_menu:menu_summary()
-            });
-        }
-    });
-    connection.end();
-});
-// 関連イラスト
-app.get("/connection_image", (req, res) => {
-    var image_id=req.query.id
-
-    var connection = mysql.createConnection(mysql_setting);
-
-    connection.connect();
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN '
-    +'(SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
-    ,image_id,function (error, results, fields){
-        if (error == null){
-            res.render('image_list.ejs',
-            {
-                title:'関連イラスト',
-                imageinfo: results,
-                header_icon: judge_function(),
-                header_menu:menu_summary()
-            });
-        }
-    });
     connection.end();
 });
 
@@ -914,7 +895,7 @@ app.get("/us:akauntolink", (req, res) => {
                 follower: follower,
                 make_list: make_list,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -931,7 +912,7 @@ app.get("/themeupload", (req, res) => {
             error:'',
             form:{theme:''},
             header_icon: judge_function(),
-            header_menu:menu_summary()
+            header_menu:sidemenu
         });
     }
 });
@@ -952,7 +933,7 @@ app.get("/illustupload", (req, res) => {
                     themeid: themeid,
                     themename: results[0],
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
@@ -1024,7 +1005,7 @@ app.get("/research", (req, res) => {
                 imageinfo: imageinfo,
                 userinfo: userinfo,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -1048,7 +1029,7 @@ app.get("/notification", (req, res) => {
             {
                 notification:results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         });
         connection.end();
@@ -1079,7 +1060,7 @@ app.get("/follow", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -1108,7 +1089,7 @@ app.get("/follower", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -1137,7 +1118,7 @@ app.get("/likes_user", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -1163,7 +1144,7 @@ app.get("/comments", (req, res) => {
                 imageinfo:imageinfo,
                 comments:results,
                 header_icon: judge_function(),
-                header_menu:menu_summary()
+                header_menu:sidemenu
             });
         }
     });
@@ -1184,7 +1165,7 @@ app.get("/setting_user", (req, res) => {
                 {
                     userinfo: results[0],
                     header_icon: judge_function(),
-                    header_menu:menu_summary()
+                    header_menu:sidemenu
                 });
             }
         });
@@ -1198,7 +1179,7 @@ app.get("/setting_password", (req, res) => {
         res.render('setting_password.ejs',
         {
             header_icon: judge_function(),
-            header_menu:menu_summary()
+            header_menu:sidemenu
         });
     }
 });
