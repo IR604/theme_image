@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>設定</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/setting.css">
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    <div class="boxB">
+        <div class="set-left">
+            <ul>
+                <a href="/setting_user"><li>ユーザー情報</li></a>
+                <a href="/setting_contents"><li>コンテンツ情報</li></a>
+                <a href="/setting_password"><li>メールアドレス・パスワード</li></a>
+            </ul>
+        </div>
+        <div class="set-right">
+            <h1>コンテンツ設定</h1>
+            <div class="area">
+                <input type="radio" name="tab_name" id="tab1" checked>
+                <label class="tab_class" for="tab1">テーマ</label>
+                <div class="content_class">
+                    <div class="user_theme">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>テーマ</th>
+                                    <th>タグ</th>
+                                    <th>編集</th>
+                                    <th>削除</th>
+                                </tr>
+                                 <tr>
+                                    <td class="table_first">見出し</td>
+                                    <td class="table_first">テキストが入ります</td>
+                                    <td class="table_third"><a href="setting_theme"><span class="material-symbols-outlined">edit</span></a></td>
+                                    <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <input type="radio" name="tab_name" id="tab2" >
+                <label class="tab_class" for="tab2">イラスト</label>
+                <div class="content_class">
+                    <div class="user_image">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>イラスト</th>
+                                    <th>タイトル</th>
+                                    <th>概要</th>
+                                    <th>編集</th>
+                                    <th>削除</th>
+                                </tr>
+                                 <tr>
+                                    <td class="table_image">見出し</td>
+                                    <td class="table_title">テキストが入ります</td>
+                                    <td class="table_summary">テキストが入ります</td>
+                                    <td class="table_third"><a href="setting_image"><span class="material-symbols-outlined">edit</span></a></td>
+                                    <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <input type="radio" name="tab_name" id="tab3" >
+                <label class="tab_class" for="tab3">作成したリスト</label>
+                <div class="content_class">
+                    <div class="user_list">
+                        <div class="user_image">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>タイトル</th>
+                                        <th>タイプ</th>
+                                        <th>編集</th>
+                                        <th>削除</th>
+                                    </tr>
+                                     <tr>
+                                        <td class="table_second">テキストが入ります</td>
+                                        <td class="table_third"><span class="material-symbols-outlined">image</span></td>
+                                        <td class="table_third"><a href="#"><span class="material-symbols-outlined">edit</span></a></td>
+                                        <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copyright">
+        コピーライト
+    </div>
+</body>
+</html>

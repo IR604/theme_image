@@ -21,14 +21,23 @@
             </ul>
         </div>
         <div class="set-right">
-            <form action="/setting_password" method="post">
-                <h1>メールアドレス・パスワード</h1>       
-                <h2>メールアドレス変更</h2>
-                <div class="fields"><input type="email" class="inputfield" name="email" placeholder="新メールアドレス"></div>
-                <h2>パスワード変更</h2>
-                <div class="fields"><input type="password" class="inputfield" name="password" placeholder="新パスワード"></div>
-                <div class="setting_submit"><input type="submit" class="submit-button" value="送信"></div>
-            </form>
+            <h1>テーマ</h1>
+            <div class="theme_summary"></div>
+            <h2>タグの編集</h2>
+            <div class="tag_update">
+                <div class="tag_one">
+                    <div class="tag_one_left">tag</div>
+                    <div class="tag_one_right">
+                        <input type="text" name="tag" class="tag_text" value="sample" placeholder="タグ">
+                    </div>
+                </div>
+                <input type="submit" class="submit-button" value="更新">
+            </div>
+            <h2>タグの挿入</h2>
+            <div class="tag_insert">
+                <input type="text" name="tag" class="tag_text" placeholder="タグ">
+                <input type="submit" class="submit-button" value="追加">
+            </div>
         </div>
     </div>
 

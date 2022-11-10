@@ -1172,6 +1172,39 @@ app.get("/setting_user", (req, res) => {
         connection.end();
     }
 });
+app.get("/setting_theme", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        res.render('setting_theme.ejs',
+        {
+            header_icon: judge_function(),
+            header_menu:sidemenu
+        });
+    }
+});
+app.get("/setting_image", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        res.render('setting_image.ejs',
+        {
+            header_icon: judge_function(),
+            header_menu:sidemenu
+        });
+    }
+});
+app.get("/setting_contents", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        res.render('setting_contents.ejs',
+    {
+        header_icon: judge_function(),
+        header_menu:sidemenu
+    });
+    }
+});
 app.get("/setting_password", (req, res) => {
     if(account_id==0){
         res.redirect('/login')
