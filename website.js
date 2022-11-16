@@ -9,7 +9,7 @@ app.use(express.static('public'));
 
 var multer = require('multer');
 var filename;
-var account_id=0;
+var account_id=1;
 var storage = multer.diskStorage({
     //ファイルの保存先を指定
     destination: function(req, file, cb){
@@ -1176,33 +1176,139 @@ app.get("/setting_theme", (req, res) => {
     if(account_id==0){
         res.redirect('/login')
     }else{
-        res.render('setting_theme.ejs',
-        {
-            header_icon: judge_function(),
-            header_menu:sidemenu
+        var theme_id=req.query.id
+
+        var tags=''
+
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        connection.query('SELECT * FROM tags where theme_id=?',theme_id,function (error, results, fields){
+            if (error == null){
+                tags=results
+            }
         });
+
+        connection.query('SELECT * FROM theme where item_id=?',theme_id,function (error, results, fields){
+            if (error == null){
+                res.render('setting_theme.ejs',
+                {
+                    themeinfo:results[0],
+                    tags:tags,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu
+                });
+            }
+        });
+        connection.end();
     }
 });
 app.get("/setting_image", (req, res) => {
     if(account_id==0){
         res.redirect('/login')
     }else{
-        res.render('setting_image.ejs',
-        {
-            header_icon: judge_function(),
-            header_menu:sidemenu
+        var image_id=req.query.id
+
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        connection.query('SELECT * FROM image where item_id=?',image_id,function (error, results, fields){
+            if (error == null){
+                res.render('setting_image.ejs',
+                {
+                    imageinfo:results[0],
+                    header_icon: judge_function(),
+                    header_menu:sidemenu
+                });
+            }
         });
+        connection.end();
+    }
+});
+app.get("/setting_list", (req, res) => {
+    if(account_id==0){
+        res.redirect('/login')
+    }else{
+        var list_id=req.query.id
+
+        var judge
+        var list_summary
+
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        connection.query('SELECT * from lists where item_id=?',list_id,function (error, results, fields){
+            if (error == null){
+                judge=results[0].type
+                list_summary=results[0]
+            }
+        });
+        
+        connection.query('SELECT theme.*, list_contents.item_id AS list_id FROM theme INNER JOIN list_contents ON theme.item_id=list_contents.contents_id '
+        +'where list_contents.list_id=? ORDER BY list_id desc',list_id,function (error, results, fields){
+            if (error == null){
+                if(judge=='theme'){
+                    res.render('setting_list_theme.ejs',
+                    {
+                        
+                        list_summary:list_summary,
+                        contents:results,
+                        header_icon: judge_function(),
+                        header_menu:sidemenu
+                    });
+                }
+            }
+        });
+            connection.query('SELECT image.*, list_contents.item_id AS list_id FROM image INNER JOIN list_contents ON image.item_id=list_contents.contents_id '
+            +'where list_contents.list_id=? ORDER BY list_id desc',list_id,function (error, results, fields){
+                if (error == null){
+                    if(judge=='image'){
+                        res.render('setting_list_image.ejs',
+                        {
+                            list_summary:list_summary,
+                            contents:results,
+                            header_icon: judge_function(),
+                            header_menu:sidemenu
+                        });
+                    }
+                }
+            });
+        connection.end();
     }
 });
 app.get("/setting_contents", (req, res) => {
     if(account_id==0){
         res.redirect('/login')
     }else{
-        res.render('setting_contents.ejs',
-    {
-        header_icon: judge_function(),
-        header_menu:sidemenu
-    });
+        var themeinfo
+        var imageinfo
+
+        var connection = mysql.createConnection(mysql_setting);
+
+        connection.connect();
+        connection.query('SELECT * FROM theme where account_id=?',account_id,function (error, results, fields){
+            if (error == null){
+                themeinfo = results
+            }
+        });
+        connection.query('SELECT * FROM image where account_id=?',account_id,function (error, results, fields){
+            if (error == null){
+                imageinfo = results
+            }
+        });
+        connection.query('SELECT *, (CASE WHEN type="theme" THEN "article" WHEN type="image" THEN "image" END)AS icon FROM lists where account_id=?',account_id,function (error, results, fields){
+            if (error == null){
+                res.render('setting_contents.ejs',
+                {
+                    themeinfo:themeinfo,
+                    imageinfo:imageinfo,
+                    listinfo:results,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu
+                });
+            }
+        });
+        connection.end();
     }
 });
 app.get("/setting_password", (req, res) => {
@@ -1575,4 +1681,79 @@ app.post('/setting_password',(req, res) => {
 });
 var server = app.listen(3000, () => {
     console.log('Start server port:3000')
+});
+
+// コンテンツ設定
+// テーマ
+app.post('/setting_theme',(req, res) => {
+    var theme_id = req.body.theme_id;
+    var tag_id = req.body.tag_id;
+    var tag = req.body.tag;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    for(var i in tag_id){
+        if(tag[i]==''){
+            connection.query('delete from tags where item_id= ?', tag_id[i], function (error, results, fields){});
+        }else{
+            var data = {'tag':tag[i], 'theme_id': theme_id}
+            connection.query('update tags set ? where item_id = ?', [data, tag_id[i]], function (error, results, fields){});
+        }
+    }
+    res.redirect('/setting_contents');
+    connection.end();
+});
+app.post('/tag_insert',(req, res) => {
+    var theme_id = req.body.theme_id;
+    var tag = req.body.tag;
+
+    insert_tag(theme_id, tag);
+    res.redirect('/setting_contents');
+});
+
+// イラスト
+app.post('/setting_image',(req, res) => {
+    var image_id = req.body.image_id;
+    var image_name = req.body.name;
+    var image_title = req.body.title;
+    var image_contents = req.body.contents;
+    var theme_id = req.body.theme_id;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    var data = {'name':image_name, 'title':image_title, 'likes':0, 'contents':image_contents, 'theme_id':theme_id, 'account_id': account_id}
+    connection.query('update image set ? where item_id = ?', [data,image_id], function (error, results, fields){
+        res.redirect('/setting_contents');
+    });
+    connection.end();
+});
+
+// リスト
+app.post('/setting_list',(req, res) => {
+    var list_id = req.body.list_id;
+    var title = req.body.title;
+    var type = req.body.type;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    var data = {'title':title, 'type':type, 'account_id': account_id}
+    connection.query('update lists set ? where item_id = ?', [data,list_id], function (error, results, fields){
+        res.redirect('/setting_contents');
+    });
+    connection.end();
+});
+app.post('/delete_listcontents',(req, res) => {
+    var list_id = req.body.list_id;
+    var contents_id = req.body.contents_id;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from list_contents where item_id=?', contents_id, function (error, results, fields){
+        res.redirect('/setting_list?id='+list_id);
+    });
+    connection.end();
 });

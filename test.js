@@ -68,7 +68,11 @@ function add_tag(id, tag){
 
 function add_image(id, theme_id, loop){
      for(var i=0;i<loop;i++){
-          var data = {'name':'nekogao.png', 'title':'sample', 'likes':1, 'contents':'sample', 'theme_id':theme_id,  'account_id': id}
+          var items = ['index1.png', 'index2.png', 'index3.png'];
+          //最大値は配列の「要素数」にする
+          var random = Math.floor( Math.random() * items.length );
+          
+          var data = {'name':items[random], 'title':'sample', 'likes':1, 'contents':'sample', 'theme_id':theme_id,  'account_id': id}
      
           var connection = mysql.createConnection(mysql_setting);
      
@@ -304,5 +308,4 @@ function all(id){
       
      connection.end();
 }
-
 all('tags')

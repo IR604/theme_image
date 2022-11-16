@@ -22,21 +22,30 @@
         </div>
         <div class="set-right">
             <h1>テーマ</h1>
-            <div class="theme_summary"></div>
+            <div class="theme_summary"><%-themeinfo.contents%></div>
             <h2>タグの編集</h2>
             <div class="tag_update">
-                <div class="tag_one">
-                    <div class="tag_one_left">tag</div>
-                    <div class="tag_one_right">
-                        <input type="text" name="tag" class="tag_text" value="sample" placeholder="タグ">
-                    </div>
-                </div>
-                <input type="submit" class="submit-button" value="更新">
+                <form action="/setting_theme" method="post">
+                    <input type="hidden" name="theme_id" value="<%= themeinfo.item_id %>">
+                    <%for(var i in tags){%>
+                        <div class="tag_one">
+                            <div class="tag_one_left"><%=tags[i].tag%></div>
+                            <div class="tag_one_right">
+                                <input type="hidden" name="tag_id" value="<%=tags[i].item_id%>">
+                                <input type="text" name="tag" class="tag_text" value="<%=tags[i].tag%>" placeholder="タグ">
+                            </div>
+                        </div>
+                    <%}%>
+                    <input type="submit" class="submit-button" value="更新">
+                </form>
             </div>
-            <h2>タグの挿入</h2>
+            <h2>タグの追加</h2>
             <div class="tag_insert">
-                <input type="text" name="tag" class="tag_text" placeholder="タグ">
-                <input type="submit" class="submit-button" value="追加">
+                <form action="/tag_insert" method="post">
+                    <input type="hidden" name="theme_id" value="<%= themeinfo.item_id %>">
+                    <input type="text" name="tag" class="tag_text" placeholder="タグ">
+                    <input type="submit" class="submit-button" value="追加">
+                </form>
             </div>
         </div>
     </div>
