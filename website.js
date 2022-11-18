@@ -1432,7 +1432,8 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
         res.render('theme_upload.ejs',{
             error: re,
             form: {theme:req.body.theme},
-            header_icon: judge_function()
+            header_icon: judge_function(),
+            header_menu:sidemenu
         });
     } else {
         var theme = req.body.theme;
@@ -1679,9 +1680,6 @@ app.post('/setting_password',(req, res) => {
     });
     res.redirect('/setting_password');
 });
-var server = app.listen(3000, () => {
-    console.log('Start server port:3000')
-});
 
 // コンテンツ設定
 // テーマ
@@ -1693,12 +1691,21 @@ app.post('/setting_theme',(req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    for(var i in tag_id){
-        if(tag[i]==''){
-            connection.query('delete from tags where item_id= ?', tag_id[i], function (error, results, fields){});
+    if(Array.isArray(tag_id)){
+        for(var i in tag_id){
+            if(tag[i]==''){
+                connection.query('delete from tags where item_id= ?', tag_id[i], function (error, results, fields){});
+            }else{
+                var data = {'tag':tag[i], 'theme_id': theme_id}
+                connection.query('update tags set ? where item_id = ?', [data, tag_id[i]], function (error, results, fields){});
+            }
+        }
+    }else{
+        if(tag==''){
+            connection.query('delete from tags where item_id= ?', tag_id, function (error, results, fields){});
         }else{
-            var data = {'tag':tag[i], 'theme_id': theme_id}
-            connection.query('update tags set ? where item_id = ?', [data, tag_id[i]], function (error, results, fields){});
+            var data = {'tag':tag, 'theme_id': theme_id}
+            connection.query('update tags set ? where item_id = ?', [data, tag_id], function (error, results, fields){});
         }
     }
     res.redirect('/setting_contents');
@@ -1756,4 +1763,47 @@ app.post('/delete_listcontents',(req, res) => {
         res.redirect('/setting_list?id='+list_id);
     });
     connection.end();
+});
+
+// コンテンツの削除
+// テーマ
+app.post('/delete_theme',(req, res) => {
+    var theme_id = req.body.theme_id;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from theme where item_id=?', theme_id, function (error, results, fields){
+        res.redirect('/setting_contents');
+    });
+    connection.end();
+});
+// イラスト
+app.post('/delete_image',(req, res) => {
+    var image_id = req.body.image_id;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from image where item_id=?', image_id, function (error, results, fields){
+        res.redirect('/setting_contents');
+    });
+    connection.end();
+});
+// リスト
+app.post('/delete_lists',(req, res) => {
+    var list_id = req.body.list_id;
+
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('delete from list_contents where list_id=?', list_id, function (error, results, fields){});
+    connection.query('delete from lists where item_id=?', list_id, function (error, results, fields){
+        res.redirect('/setting_contents');
+    });
+    connection.end();
+});
+
+var server = app.listen(3000, () => {
+    console.log('Start server port:3000')
 });

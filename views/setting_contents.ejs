@@ -26,6 +26,7 @@
                 <input type="radio" name="tab_name" id="tab1" checked>
                 <label class="tab_class" for="tab1">テーマ</label>
                 <div class="content_class">
+                    <input type="hidden" id="theme_num" value=<%-themeinfo.length%>>
                     <div class="user_theme">
                         <table>
                             <tbody>
@@ -38,7 +39,17 @@
                                     <tr>
                                         <td class="table_first"><%=themeinfo[i].contents%></td>
                                         <td class="table_third"><a href="setting_theme?id=<%=themeinfo[i].item_id%>"><span class="material-symbols-outlined">edit</span></a></td>
-                                        <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                        <td class="table_third">
+                                            <dialog id="theme_<%=i%>">
+                                                <p><%=themeinfo[i].contents%>を削除しますか？</p>
+                                                <form action="/delete_theme" method="post">
+                                                    <input type="hidden" name="theme_id" value="<%-themeinfo[i].item_id%>">
+                                                    <button type="submit">削除</button>
+                                                </form>
+                                                <button id="close_t<%=i%>">キャンセル</button>
+                                            </dialog>
+                                            <button id="show_t<%=i%>" class="delete_submit" <%-"onclick=theme_contents("+i+")"%>><span class="material-symbols-outlined">delete</span></button>
+                                        </td>
                                     </tr>
                                 <%}%>
                             </tbody>
@@ -48,6 +59,7 @@
                 <input type="radio" name="tab_name" id="tab2" >
                 <label class="tab_class" for="tab2">イラスト</label>
                 <div class="content_class">
+                    <input type="hidden" id="image_num" value=<%-imageinfo.length%>>
                     <div class="user_image">
                         <table>
                             <tbody>
@@ -64,7 +76,17 @@
                                         <td class="table_title"><%=imageinfo[i].title%></td>
                                         <td class="table_summary"><%=imageinfo[i].contents%></td>
                                         <td class="table_third"><a href="setting_image?id=<%=imageinfo[i].item_id%>"><span class="material-symbols-outlined">edit</span></a></td>
-                                        <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                        <td class="table_third">
+                                            <dialog id="image_<%=i%>">
+                                                <p><%=imageinfo[i].title%>を削除しますか？</p>
+                                                <form action="/delete_image" method="post">
+                                                    <input type="hidden" name="image_id" value=<%-imageinfo[i].item_id%>>
+                                                    <button type="submit">削除</button>
+                                                </form>
+                                                <button id="close_i<%=i%>">キャンセル</button>
+                                            </dialog>
+                                            <button id="show_i<%=i%>" class="delete_submit" <%-"onclick=image_contents("+i+")"%>><span class="material-symbols-outlined">delete</span></button>
+                                        </td>
                                     </tr>
                                 <%}%>
                             </tbody>
@@ -74,6 +96,7 @@
                 <input type="radio" name="tab_name" id="tab3" >
                 <label class="tab_class" for="tab3">作成したリスト</label>
                 <div class="content_class">
+                    <input type="hidden" id="list_num" value=<%-listinfo.length%>>
                     <div class="user_list">
                         <div class="user_image">
                             <table>
@@ -89,7 +112,17 @@
                                             <td class="table_second"><%=listinfo[i].title%></td>
                                             <td class="table_third"><span class="material-symbols-outlined"><%-listinfo[i].icon%></span></td>
                                             <td class="table_third"><a href="/setting_list?id=<%=listinfo[i].item_id%>"><span class="material-symbols-outlined">edit</span></a></td>
-                                            <td class="table_third"><button type="submit" class="delete_submit"><span class="material-symbols-outlined">delete</span></button></td>
+                                            <td class="table_third">
+                                                <dialog id="<%=i%>">
+                                                    <p><%=listinfo[i].title%>を削除しますか？</p>
+                                                    <form action="/delete_lists" method="post">
+                                                        <input type="hidden" name="list_id" value=<%-listinfo[i].item_id%>>
+                                                        <button type="submit">削除</button>
+                                                    </form>
+                                                    <button id="close<%=i%>">キャンセル</button>
+                                                </dialog>
+                                                <button id="show<%=i%>" class="delete_submit" <%-"onclick=list_contents("+i+")"%>><span class="material-symbols-outlined">delete</span></button>
+                                            </td>
                                         </tr>
                                     <%}%>
                                 </tbody>
@@ -104,5 +137,64 @@
     <div class="copyright">
         コピーライト
     </div>
+    <script>
+        // テーマ
+        function theme_contents(button){
+            var theme = document.getElementById('theme_num');
+            var theme_num=Number(theme.value)
+            var dialog = [];
+            var btn_show = [];
+            var btn_close = [];
+            for(var i=0;i<theme_num;i++){
+                dialog.push(document.getElementById('theme_'+i));
+                btn_show.push(document.getElementById('show_t'+i));
+                btn_close.push(document.getElementById('close_t'+i));
+            }
+            btn_show[button].addEventListener('click', function() {
+                dialog[button].showModal();
+            }, false);
+            btn_close[button].addEventListener('click', function() {
+                dialog[button].close();
+            }, false);
+        }
+        // イラスト
+        function image_contents(button){
+            var image = document.getElementById('image_num');
+            var image_num=Number(image.value)
+            var dialog = [];
+            var btn_show = [];
+            var btn_close = [];
+            for(var i=0;i<image_num;i++){
+                dialog.push(document.getElementById('image_'+i));
+                btn_show.push(document.getElementById('show_i'+i));
+                btn_close.push(document.getElementById('close_i'+i));
+            }
+            btn_show[button].addEventListener('click', function() {
+                dialog[button].showModal();
+            }, false);
+            btn_close[button].addEventListener('click', function() {
+                dialog[button].close();
+            }, false);
+        }
+        // リスト
+        function list_contents(button){
+            var list = document.getElementById('list_num');
+            var list_num=Number(list.value)
+            var dialog = [];
+            var btn_show = [];
+            var btn_close = [];
+            for(var i=0;i<list_num;i++){
+                dialog.push(document.getElementById(i));
+                btn_show.push(document.getElementById('show'+i));
+                btn_close.push(document.getElementById('close'+i));
+            }
+            btn_show[button].addEventListener('click', function() {
+                dialog[button].showModal();
+            }, false);
+            btn_close[button].addEventListener('click', function() {
+                dialog[button].close();
+            }, false);
+        }
+    </script>
 </body>
 </html>
