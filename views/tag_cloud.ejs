@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>タグクラウド</title>
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="css/tag_cloud.css">
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body>
+    <%- include('header')%>
+    <div id="chartdiv"></div>
+    <div class="copyright">
+        コピーライト
+    </div>
+
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/plugins/wordCloud.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+    <!-- Chart code -->
+    <%-clouds%>
+
+    <script>
+        am4core.ready(function() {
+
+            am4core.useTheme(am4themes_animated);
+
+            const chart = am4core.create("chartdiv", am4plugins_wordCloud.WordCloud);
+            chart.fontFamily = "Courier New";
+            const series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries());
+            series.randomness = 0.1;
+            series.rotationThreshold = 0.5;
+
+            series.data = tag_data;
+
+            series.dataFields.word = "tag";
+            series.dataFields.value = "count";
+
+            series.heatRules.push({
+                "target": series.labels.template,
+                "property": "fill",
+                "min": am4core.color("#ffd900"),
+                "max": am4core.color("#ff8c00"),
+                "dataField": "value"
+            });
+
+            series.labels.template.url = "/research?search={word}";
+            series.labels.template.urlTarget = "_blank";
+            series.labels.template.tooltipText = "{word}: {value}";
+
+            const hoverState = series.labels.template.states.create("hover");
+            hoverState.properties.fill = am4core.color("#FF0000");
+
+            const subtitle = chart.titles.create();
+            subtitle.text = "クリックで開く";
+
+            const title = chart.titles.create();
+            title.text = "現在、存在するタグ一覧";
+            title.fontSize = 20;
+            title.fontWeight = "800";
+
+        });
+    </script>
+</body>
+</html>

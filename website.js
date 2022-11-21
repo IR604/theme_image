@@ -144,6 +144,9 @@ app.all("*", (req, res, next) => {
         +'<a href="/">'
         +'<li><span class="material-symbols-outlined">home</span>　トップページ</li>'
         +'</a>'
+        +'<a href="/tag_cloud">'
+        +'<li><span class="material-symbols-outlined">sell</span>　タグクラウド</li>'
+        +'</a>'
         +'<h2>設定</h2>'
         +'<a href="/login">'
         +'<li><span class="material-symbols-outlined">login</span>　ログイン</li>'
@@ -200,6 +203,9 @@ app.all("*", (req, res, next) => {
             +'</a>'
             +'<a href="/us'+account_id+'">'
             +'<li><span class="material-symbols-outlined">person</span>　マイページ</li>'
+            +'</a>'
+            +'<a href="/tag_cloud">'
+            +'<li><span class="material-symbols-outlined">sell</span>　タグクラウド</li>'
             +'</a>'
             +'<h2>コンテンツ</h2>'
             +'<a href="/follow_content?type=theme">'
@@ -1328,6 +1334,29 @@ app.get("/setting_password", (req, res) => {
         });
     }
 });
+
+// タグクラウド
+app.get("/tag_cloud", (req, res)=>{
+    var connection = mysql.createConnection(mysql_setting);
+
+    connection.connect();
+    connection.query('SELECT tag, count(*) AS tag_count FROM tags GROUP BY tag',function (error, results, fields){
+        if (error == null){
+            var clouds='<script>var tag_data=['
+            for(var i in results){
+                clouds+='{"tag": "'+results[i].tag+'","count": "'+results[i].tag_count+'"},'
+            }
+            clouds+=']</script>'
+            res.render('tag_cloud.ejs',
+            {
+                clouds:clouds,
+                header_icon: judge_function(),
+                header_menu:sidemenu
+            });
+        }
+    });
+    connection.end();
+})
 
 // ログイン処理
 app.post('/login', (req, res) => {
