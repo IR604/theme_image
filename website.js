@@ -944,40 +944,46 @@ app.get("/illustupload", (req, res) => {
 // researchページ
 app.get("/research", (req, res) => {
     var word = req.query.search;
-    var type = req.query.decide;
 
-    var word_split=word.split(/[ 　]/)
+    //SELECT * FROM theme WHERE contents REGEXP("(.*mp.*)|(.*s.*)");
+    //SELECT * FROM theme LEFT JOIN tags ON theme.item_id=tags.theme_id;
+    //SELECT DISTINCT theme.* FROM theme LEFT JOIN tags ON theme.item_id=tags.theme_id where tags.tag='sample' or tags.tag='tag' ;
+
+    var word_split=word.split(/[ 　.\[\]*+?|^$\(\)\{\}-]/)
     var title = word + 'の検索結果'
     var name = 'ir604'
     var imageinfo;
     var userinfo;
 
-    var DB_result_theme='SELECT * from theme where '
-    var DB_result_image='SELECT image.*, theme.tag from image INNER JOIN theme ON image.theme_id=theme.item_id where '
-    var DB_result_name='SELECT * from user_information where '
+    var research_words='REGEXP("'
     var Search_ber=''
     var setting='<div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag" checked>タグ部分一致</div>'
     +'<div class="setting_sample"><input type="radio" class="decided" name="decide" value="title">タイトル部分一致</div>'
     for(var i in word_split){
         Search_ber+=word_split[i]
-        if(type=='tag'){
-            DB_result_theme+='tag like "%'+word_split[i]+'%"'
-            DB_result_image+='theme.tag like "%'+word_split[i]+'%"'
-        }else{
-            DB_result_theme+='contents like "%'+word_split[i]+'%"'
-            DB_result_image+='image.title like "%'+word_split[i]+'%"'
-            setting='<div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag">タグ部分一致</div>'
-            +'<div class="setting_sample"><input type="radio" class="decided" name="decide" value="title" checked>タイトル部分一致</div>'
-        }
-        DB_result_name+='name like "%'+word_split[i]+'%"'
+        research_words+='(.*'+word_split[i]+'.*)'
         if(i!=word_split.length-1){
             Search_ber+=' '
-            DB_result_theme+=' and '
-            DB_result_image+=' and '
-            DB_result_name+=' and '
+            research_words+='*'
+        }else{
+            research_words+='")'
         }
     }
     
+    var DB_result_theme='SELECT DISTINCT theme.* from theme LEFT JOIN tags ON theme.item_id=tags.theme_id '
+    +'where theme.contents '+research_words
+    +'or tags.tag '+research_words
+    +'ORDER by item_id desc'
+    var DB_result_image='SELECT DISTINCT image.* from image LEFT JOIN tags ON image.theme_id=tags.theme_id '
+    +'where image.title '+research_words
+    +'or image.contents '+research_words
+    +'or tags.tag '+research_words
+    +'ORDER by item_id desc'
+    var DB_result_name='SELECT * from user_information '
+    +'where name '+research_words
+    +'or summary '+research_words
+    +'ORDER by name'
+
     var connection = mysql.createConnection(mysql_setting);
     connection.connect();
     // ユーザー
@@ -1444,7 +1450,9 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 
         connection.connect();
         connection.query('insert into theme set ?', data, function (error, results, fields){
-            insert_tag(results.insertId, tag)
+            if(tag!=''){
+                insert_tag(results.insertId, tag)
+            }
             upload_notification(results.insertId, theme, 'theme')
             res.redirect('/tm'+results.insertId);
         });
@@ -1658,18 +1666,9 @@ app.post('/setting_user',upload_header.single('header'),(req, res) => {
     connection.end();
 });
 app.post('/setting_password',(req, res) => {
-    var email = req.body.email;
     var password = req.body.password;
 
     const auth=firebase_auth.getAuth();
-
-    firebase_auth.updateEmail(auth.currentUser, email).then(() => {
-    }).catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-    });
 
     firebase_auth.updatePassword(auth.currentUser, password).then(() => {
     }).catch((error) => {
@@ -1677,8 +1676,8 @@ app.post('/setting_password',(req, res) => {
         const errorMessage = error.message;
         console.log(errorCode);
         console.log(errorMessage);
+        res.redirect('/setting_password');
     });
-    res.redirect('/setting_password');
 });
 
 // コンテンツ設定

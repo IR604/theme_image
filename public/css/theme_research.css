@@ -94,3 +94,35 @@
     height:50px;
     background:#ffee8f;
 }
+
+/* タブ管理 */
+.area {
+    flex-wrap: wrap;
+    display: flex;
+}
+.tab_class {
+    margin-right:10px;
+    color: #8a8a8a;
+    width: auto;
+    height: 50px;
+    background-color: #ffffff;
+    line-height: 50px;
+    font-size: 30px;
+    text-align: center;
+    display: block;
+    float: left;
+    order: -1;
+}
+input[name="tab_name"] {
+    display: none;
+}
+input:checked + .tab_class {
+    border-bottom:solid 5px #666666;
+}
+.content_class {
+    display: none;
+    width: 100%;
+}
+input:checked + .tab_class + .content_class {
+    display: block;
+}

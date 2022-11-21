@@ -19,92 +19,83 @@
                 <div class="search_bar">
                     <span class="material-symbols-outlined">search</span>
                     <input id="text2" type="text" placeholder="キーワードを入力" name="search" value="<%-search%>">
-                    <details>
-                        <summary class="menuber">
-                            <span class="material-symbols-outlined">settings</span>
-                        </summary>
-                        <div class="setting_summary">
-                            <%-setting%>
-                        </div>
-                    </details>
                 </div>
             </form>
         </div>
             
         <div class="boxB">
-            <div class="box2">
-                見つかったテーマ
-            </div>
-            <div class="theme_box">
-                <% for(var i in themeinfo) { %>
-                    <div class="theme_ichiran">
-                        <a href="/tm<%=themeinfo[i].item_id%>">
-                            <div class="theme_top">
-                                <%=themeinfo[i].contents%>
+            <div class="area">
+                <input type="radio" name="tab_name" id="tab1" checked>
+                <label class="tab_class" for="tab1">テーマ</label>
+                <div class="content_class">
+                    <div class="theme_box">
+                        <% for(var i in themeinfo) { %>
+                            <div class="theme_ichiran">
+                                <a href="/tm<%=themeinfo[i].item_id%>">
+                                    <div class="theme_top">
+                                        <%=themeinfo[i].contents%>
+                                    </div>
+                                </a>
+                                <a href="us<%-themeinfo[i].account_id%>">
+                                    <div class="theme_bottom">
+                                        <div class="theme_icon">
+                                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                        </div>
+                                        <div class="theme_name">
+                                            <%-name%>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
-                        <a href="us<%-themeinfo[i].account_id%>">
-                            <div class="theme_bottom">
-                                <div class="theme_icon">
-                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
-                                </div>
-                                <div class="theme_name">
-                                    <%-name%>
-                                </div>
-                            </div>
-                        </a>
+                        <% } %>
                     </div>
-                <% } %>
-            </div>
-        </div>
-
-        <div class="boxB">
-            <div class="box2">
-                見つかったイラスト
-            </div>
-            <div class="image_box">
-                <% for(var i in imageinfo) { %>
-                    <div class="image_ichiran">
-                        <a href="im<%-imageinfo[i].item_id%>">
-                            <div class="image_top">
-                                <img src="images/images/<%-imageinfo[i].name%>" width="100%" height="100%">
+                </div>
+                <input type="radio" name="tab_name" id="tab2" >
+                <label class="tab_class" for="tab2">イラスト</label>
+                <div class="content_class">
+                    <div class="image_box">
+                        <% for(var i in imageinfo) { %>
+                            <div class="image_ichiran">
+                                <a href="/im<%-imageinfo[i].item_id%>">
+                                    <div class="image_top">
+                                        <img src="images/images/<%-imageinfo[i].name%>" width="100%" height="100%">
+                                    </div>
+                                    <div class="image_top2">
+                                        <%-imageinfo[i].title%>
+                                    </div>
+                                </a>
+                                <a href="/us<%-imageinfo[i].account_id%>">
+                                    <div class="theme_bottom">
+                                        <div class="theme_icon">
+                                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                        </div>
+                                        <div class="theme_name">
+                                            <%-name%>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
-                            <div class="image_top2">
-                                <%-imageinfo[i].title%>
-                            </div>
-                        </a>
-                        <a href="us<%-imageinfo[i].account_id%>">
-                            <div class="theme_bottom">
-                                <div class="theme_icon">
-                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
-                                </div>
-                                <div class="theme_name">
-                                    <%-name%>
-                                </div>
-                            </div>
-                        </a>
+                        <% } %>
                     </div>
-                <% } %>
-            </div>
-        </div>
-
-        <div class="boxB">
-            <div class="box2">
-                見つかったユーザー
-            </div>
-            <div class="box3">
-                <% for(var i in userinfo) { %>
-                    <a href="us<%-userinfo[i].item_id%>">
-                        <div class="user_ichiran">
-                            <div class="user_top">
-                                <img src="images/icons/<%-userinfo[i].item_id%>.jpg"  id="avatar" alt=""  width="150" height="150">
+                </div>
+                <input type="radio" name="tab_name" id="tab3" >
+                <label class="tab_class" for="tab3">ユーザー</label>
+                <div class="content_class">
+                    <div class="theme_box">
+                    <% for(var i in userinfo) { %>
+                        <a href="us<%-userinfo[i].item_id%>">
+                            <div class="user_ichiran">
+                                <div class="user_top">
+                                    <img src="images/icons/<%-userinfo[i].item_id%>.jpg"  id="avatar" alt=""  width="150" height="150">
+                                </div>
+                                <div class="user_bottom">
+                                    <%-userinfo[i].name%>
+                                </div>
                             </div>
-                            <div class="user_bottom">
-                                <%-userinfo[i].name%>
-                            </div>
-                        </div>
-                    </a>
-                <% } %>
+                        </a>
+                    <% } %>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

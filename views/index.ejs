@@ -22,26 +22,17 @@
                 <div class="search_bar">
                     <span class="material-symbols-outlined">search</span>
                     <input id="text2" type="text" placeholder="キーワードを入力" name="search">
-                    <details>
-                        <summary class="menuber">
-                            <span class="material-symbols-outlined">settings</span>
-                        </summary>
-                        <div class="setting_summary">
-                            <div class="setting_sample"><input type="radio" class="decided" name="decide" value="tag" checked>タグ部分一致</div>
-                            <div class="setting_sample"><input type="radio" class="decided" name="decide" value="title">タイトル部分一致</div>
-                        </div>
-                    </details>
                 </div>
             </form>
         </div>
         <div class="boxB">
             <div class="boxB-1">
                 <div class="box3">
-                    <div class="box3-1">
+                    <h2 class="box3-1">
                         <a href="topic?type=theme">
                             話題のテーマ
                         </a>
-                    </div>
+                    </h2>
                     <div class="theme_box">
                         <% for(var i in themeinfo) { %>
                             <div class="theme_ichiran">
@@ -64,12 +55,14 @@
                         <% } %>
                     </div>
                 </div>
+            </div>
+            <div class="boxB-1">
                 <div class="box4">
-                    <div class="box3-1">
+                    <h2 class="box3-1">
                         <a href="topic?type=image">
                             話題のイラスト
                         </a>
-                    </div>
+                    </h2>
                     <div class="image_box">
                         <% for(var i in imageinfo) { %>
                             <div class="image_ichiran">
