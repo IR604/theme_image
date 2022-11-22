@@ -8,7 +8,7 @@ app.engine('ejs',ejs.renderFile);
 app.use(express.static('public'));
 
 var multer = require('multer');
-var filename;
+var filename='';
 var account_id=1;
 var storage = multer.diskStorage({
     //ファイルの保存先を指定
@@ -1492,29 +1492,41 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
 
 // イラストアップロード処理
 app.post('/illustupload',upload.single('file'),(req, res) => {
-    var title = req.body.title;
-    var gaiyou = req.body.gaiyou;
     var theme_id = req.body.id;
-    var data = {'name':filename, 'title':title, 'likes':0, 'contents':gaiyou, 'theme_id':theme_id,  'account_id': account_id}
+    if(filename.split('.').pop()=='png'
+    ||filename.split('.').pop()=='jpg'
+    ||filename.split('.').pop()=='gif'){
+        var title = req.body.title;
+        if(title==''){title='Untitled'}
+        var gaiyou = req.body.gaiyou;
+        var data = {'name':filename, 'title':title, 'likes':0, 'contents':gaiyou, 'theme_id':theme_id,  'account_id': account_id}
 
-    var connection = mysql.createConnection(mysql_setting);
+        var connection = mysql.createConnection(mysql_setting);
+        
+        connection.connect();
 
-    connection.connect();
+        var theme_account=0
+        connection.query('SELECT account_id FROM theme where item_id=?',theme_id, function (error, results, fields){
+            theme_account=results[0].account_id
+        });
 
-    var theme_account=0
-    connection.query('SELECT account_id FROM theme where item_id=?',theme_id, function (error, results, fields){
-        theme_account=results[0].account_id
-    });
+        connection.query('insert into image set ?', data, function (error, results, fields){
+            upload_notification(results.insertId, title, 'image', theme_id)
+            if(account_id!=theme_account){
+                upload_mytheme(results.insertId, theme_account)
+            }
+            filename=''
+            res.redirect('/im'+results.insertId);
+        });
 
-    connection.query('insert into image set ?', data, function (error, results, fields){
-        upload_notification(results.insertId, title, 'image', theme_id)
-        if(account_id!=theme_account){
-            upload_mytheme(results.insertId, theme_account)
+        connection.end();
+    }else{
+        if(filename!=''){
+            fs.unlinkSync('./public/images/images/'+filename);
         }
-        res.redirect('/im'+results.insertId);
-    });
-
-    connection.end();
+        filename=''
+        res.redirect('/illustupload?id='+theme_id)
+    }
 });
 
 // リスト作成処理

@@ -82,18 +82,18 @@
                 <label class="tab_class" for="tab3">ユーザー</label>
                 <div class="content_class">
                     <div class="theme_box">
-                    <% for(var i in userinfo) { %>
-                        <a href="us<%-userinfo[i].item_id%>">
-                            <div class="user_ichiran">
-                                <div class="user_top">
-                                    <img src="images/icons/<%-userinfo[i].item_id%>.jpg"  id="avatar" alt=""  width="150" height="150">
+                        <% for(var i in userinfo) { %>
+                            <a href="us<%-userinfo[i].item_id%>">
+                                <div class="user_ichiran">
+                                    <div class="user_top">
+                                        <img src="images/icons/<%-userinfo[i].item_id%>.jpg"  id="avatar" alt=""  width="150" height="150">
+                                    </div>
+                                    <div class="user_bottom">
+                                        <%-userinfo[i].name%>
+                                    </div>
                                 </div>
-                                <div class="user_bottom">
-                                    <%-userinfo[i].name%>
-                                </div>
-                            </div>
-                        </a>
-                    <% } %>
+                            </a>
+                        <% } %>
                     </div>
                 </div>
             </div>
