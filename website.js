@@ -241,7 +241,8 @@ app.get("/", (req, res) => {
 
     connection.connect();
     connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             imageinfo = results
         }
@@ -250,7 +251,7 @@ app.get("/", (req, res) => {
     +'FROM theme LEFT JOIN '
     +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
     +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
-    +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
+    +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             res.render('index.ejs',
             {
