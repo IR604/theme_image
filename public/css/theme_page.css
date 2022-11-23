@@ -48,6 +48,7 @@ span{
     height:170px;
     font-weight: bold;
     border: solid 3px #000000;
+    position: relative;
 }
 
 .box2{
@@ -104,6 +105,12 @@ span{
     padding-right: 20px;
     width:auto;
     height:45px;
+}
+
+.date{color:#727272;
+    position:absolute;
+    right: 0;
+    bottom: 0;
 }
 
 .upload_button, .list_add{

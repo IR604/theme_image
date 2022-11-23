@@ -39,12 +39,14 @@ function add_user(loop){
 
 function add_theme(id, loop){
      for(var i=0;i<loop;i++){
-          var data = {'contents':'sample', 'tag':'tag,sample', 'account_id': id}
-     
           var connection = mysql.createConnection(mysql_setting);
 
           connection.connect();
-          connection.query('insert into theme set ?', data, function (error, results, fields){
+          const insert_contents='insert into theme set '
+          +'contents="sample"'
+          +',date=now()'
+          +',account_id='+id
+          connection.query(insert_contents, function (error, results, fields){
                add_tag(results.insertId, 'tag,sample')
           });
           
@@ -72,12 +74,19 @@ function add_image(id, theme_id, loop){
           //最大値は配列の「要素数」にする
           var random = Math.floor( Math.random() * items.length );
           
-          var data = {'name':items[random], 'title':'sample', 'likes':1, 'contents':'sample', 'theme_id':theme_id,  'account_id': id}
-     
+          const insert_contents='insert into image set '
+          +'name="'+items[random]+'"'
+          +',title="sample"'
+          +',contents="sample"'
+          +',views=0'
+          +',date=now()'
+          +',theme_id='+theme_id
+          +',account_id='+id
+
           var connection = mysql.createConnection(mysql_setting);
      
           connection.connect();
-          connection.query('insert into image set ?', data, function (error, results, fields){
+          connection.query(insert_contents, function (error, results, fields){
           });
      
           connection.end();

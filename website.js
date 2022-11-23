@@ -307,6 +307,9 @@ app.get("/im:imagelink", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
     
     connection.connect(); 
+    // 閲覧回数上昇
+    connection.query('update image set views=views+1 where item_id=?',imagelink,function (error, results, fields){});
+
     var list_add=''
     if(account_id==0){
         list_add='<a href="login">ログインが必要です。</a>'
@@ -1473,12 +1476,15 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
     } else {
         var theme = req.body.theme;
         var tag = req.body.tag;
-        var data = {'contents':theme, 'tag':tag, 'account_id': account_id}
+        const insert_contents='insert into theme set '
+        +'contents="'+theme+'"'
+        +',date=now()'
+        +',account_id='+account_id
         
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
-        connection.query('insert into theme set ?', data, function (error, results, fields){
+        connection.query(insert_contents, function (error, results, fields){
             if(tag!=''){
                 insert_tag(results.insertId, tag)
             }
@@ -1499,7 +1505,14 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
         var title = req.body.title;
         if(title==''){title='Untitled'}
         var gaiyou = req.body.gaiyou;
-        var data = {'name':filename, 'title':title, 'likes':0, 'contents':gaiyou, 'theme_id':theme_id,  'account_id': account_id}
+        const insert_contents='insert into image set '
+          +'name="'+filename+'"'
+          +',title="'+title+'"'
+          +',contents="'+gaiyou+'"'
+          +',views=0'
+          +',date=now()'
+          +',theme_id='+theme_id
+          +',account_id='+account_id
 
         var connection = mysql.createConnection(mysql_setting);
         
@@ -1510,7 +1523,7 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
             theme_account=results[0].account_id
         });
 
-        connection.query('insert into image set ?', data, function (error, results, fields){
+        connection.query(insert_contents, function (error, results, fields){
             upload_notification(results.insertId, title, 'image', theme_id)
             if(account_id!=theme_account){
                 upload_mytheme(results.insertId, theme_account)

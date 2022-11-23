@@ -207,6 +207,10 @@
     background:#ffee8f;
 }
 
+.date{color:#727272;
+    border-bottom:dotted 2px #dddddd;
+}
+
 /*シェア関係*/
 .share ul   {margin: 0;
     padding: 0;
