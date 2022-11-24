@@ -17,7 +17,12 @@
             <h1>通知一覧</h1>
         <ul>
             <% for(var i in notification) { %>
-                <a href="<%-notification[i].typeM%><%-notification[i].contents_id%>"><li><%=notification[i].summary%></li></a>
+                <a href="<%-notification[i].typeM%><%-notification[i].contents_id%>">
+                    <li class="<%=notification[i].background%>">
+                        <img src="images/icons/<%=notification[i].visiter_id%>.jpg"  id="avatar" alt=""  width="70" height="70">
+                        <%=notification[i].summary%>
+                    </li>
+                </a>
             <% } %>
         </ul>
         </div>

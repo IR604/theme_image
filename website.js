@@ -96,24 +96,27 @@ function upload_mytheme(item_id, visited_id){
     +'visiter_id='+account_id
     +',visited_id='+visited_id
     +',contents_id='+item_id
-    +',type="image",contents_post=false'
+    +',type="image",view=false'
     +', summary=(SELECT CONCAT(name, "さんがあなたのテーマで投稿しました。") FROM user_information where item_id='+account_id+')'
+    +',date=now()'
     connection.query(bell, function (error, results, fields){
     });
     connection.end();
 }
-function upload_notification(item_id, title, type){
+function upload_notification(item_id, title, type, notification_id){
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    const bell='insert into notification set '
-    +'visiter_id='+account_id
-    +',visited_id=0'
-    +',contents_id='+item_id
-    +',type="'+type+'",contents_post=true'
-    +', summary=(SELECT CONCAT(name, "さんが「'+title+'」をアップロードしました。") FROM user_information where item_id='+account_id+')'
-    connection.query(bell, function (error, results, fields){
-    });
+    for(var i in notification_id){
+        const bell='insert into notification set '
+        +'visiter_id='+account_id
+        +',visited_id='+notification_id[i].account_id
+        +',contents_id='+item_id
+        +',type="'+type+'",view=false'
+        +', summary=(SELECT CONCAT(name, "さんが「'+title+'」をアップロードしました。") FROM user_information where item_id='+account_id+')'
+        +',date=now()'
+        connection.query(bell, function (error, results, fields){});
+    }
     connection.end();
 }
 
@@ -134,6 +137,7 @@ function insert_tag(id, tag){
 
 // ページ一覧
 var sidemenu=''
+var bell_num=''
 app.all("*", (req, res, next) => {
     // メニュー
     var connection = mysql.createConnection(mysql_setting);
@@ -227,6 +231,20 @@ app.all("*", (req, res, next) => {
             +'</ul>'
         });
     }
+
+    // 通知数
+    if(account_id==0){
+        bell_num=''
+    }else{
+        connection.query('SELECT count(*) AS bell_num FROM notification where view=false GROUP BY visited_id HAVING visited_id=?',account_id ,function (error, results, fields){
+            if(results[0]==null){
+                bell_num=''
+            }else{
+                bell_num='<div class="bell_num">'+results[0].bell_num+'</div>'
+            }
+        });       
+    }
+    
     connection.end();
     next();
 });
@@ -262,7 +280,8 @@ app.get("/", (req, res) => {
                 imagelink: imagelink,
                 akauntolink: akauntolink,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -448,7 +467,8 @@ app.get("/im:imagelink", (req, res) => {
                 like:like,
                 list_add: list_add,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -558,7 +578,8 @@ app.get("/tm:themelink", (req, res) => {
                 judgement: judgement,
                 list_add: list_add,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -591,7 +612,8 @@ app.get("/list:listlink", (req, res) => {
                     title: title,
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         }
@@ -605,7 +627,8 @@ app.get("/list:listlink", (req, res) => {
                     title: title,
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         }
@@ -623,27 +646,30 @@ app.get("/topic", (req, res) => {
         +'FROM theme LEFT JOIN '
         +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
         +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
-        +'GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
+        +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('theme_list.ejs',
                 {
                     title:'話題のテーマ',
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
     }else if(type=='image'){
         connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-        +'from image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
+        +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+        +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
                     title:'話題のイラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -667,7 +693,8 @@ app.get("/theme_image", (req, res) => {
                 title:'投稿されたイラスト',
                 imageinfo: results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -688,7 +715,8 @@ app.get("/same_image", (req, res) => {
                 title:'同テーマのイラスト',
                 imageinfo: results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -709,7 +737,8 @@ app.get("/likes", (req, res) => {
                     title:'いいねしたイラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -733,7 +762,8 @@ app.get("/follow_content", (req, res) => {
                         title:'フォローしたユーザーのテーマ',
                         themeinfo: results,
                         header_icon: judge_function(),
-                        header_menu:sidemenu
+                        header_menu:sidemenu,
+                        bell_num:bell_num
                     });
                 }
             });
@@ -745,7 +775,8 @@ app.get("/follow_content", (req, res) => {
                         title:'フォローしたユーザーのイラスト',
                         imageinfo: results,
                         header_icon: judge_function(),
-                        header_menu:sidemenu
+                        header_menu:sidemenu,
+                        bell_num:bell_num
                     });
                 }
             });
@@ -774,7 +805,8 @@ app.get("/connection", (req, res) => {
                     title:'関連テーマ',
                     themeinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -789,7 +821,8 @@ app.get("/connection", (req, res) => {
                     title:'関連イラスト',
                     imageinfo: results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -905,7 +938,8 @@ app.get("/us:akauntolink", (req, res) => {
                 follower: follower,
                 make_list: make_list,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -922,7 +956,8 @@ app.get("/themeupload", (req, res) => {
             error:'',
             form:{theme:''},
             header_icon: judge_function(),
-            header_menu:sidemenu
+            header_menu:sidemenu,
+            bell_num:bell_num
         });
     }
 });
@@ -943,7 +978,8 @@ app.get("/illustupload", (req, res) => {
                     themeid: themeid,
                     themename: results[0],
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -1021,7 +1057,8 @@ app.get("/research", (req, res) => {
                 imageinfo: imageinfo,
                 userinfo: userinfo,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1036,18 +1073,19 @@ app.get("/notification", (req, res) => {
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
-        const bell='SELECT *, (CASE WHEN type="theme" THEN "th" WHEN type="image" THEN "im" WHEN type="user" THEN "us" END)AS typeM from notification '
-        +'where (contents_post=false AND visited_id=?) '
-        +'OR (contents_post=true AND visiter_id IN (SELECT follow_id FROM follow where account_id=?)) '
-        +'ORDER BY item_id desc'
-        connection.query(bell, [account_id, account_id], function (error, results, fields){
+        const bell='SELECT *, (CASE WHEN type="theme" THEN "tm" WHEN type="image" THEN "im" WHEN type="user" THEN "us" END)AS typeM, '
+        +'(CASE WHEN view=false THEN "never" ELSE "none" END)AS background from notification '
+        +'where visited_id=? ORDER BY item_id desc'
+        connection.query(bell, account_id, function (error, results, fields){
             res.render('notification.ejs',
             {
                 notification:results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         });
+        connection.query('update notification set view=true where visited_id=?', account_id, function (error, results, fields){});
         connection.end();
     }
 });
@@ -1076,7 +1114,8 @@ app.get("/follow", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1105,7 +1144,8 @@ app.get("/follower", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1134,7 +1174,8 @@ app.get("/likes_user", (req, res) => {
                 title:title,
                 userinfo:results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1160,7 +1201,8 @@ app.get("/comments", (req, res) => {
                 imageinfo:imageinfo,
                 comments:results,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1181,7 +1223,8 @@ app.get("/setting_user", (req, res) => {
                 {
                     userinfo: results[0],
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -1212,7 +1255,8 @@ app.get("/setting_theme", (req, res) => {
                     themeinfo:results[0],
                     tags:tags,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -1234,7 +1278,8 @@ app.get("/setting_image", (req, res) => {
                 {
                     imageinfo:results[0],
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -1270,7 +1315,8 @@ app.get("/setting_list", (req, res) => {
                         list_summary:list_summary,
                         contents:results,
                         header_icon: judge_function(),
-                        header_menu:sidemenu
+                        header_menu:sidemenu,
+                        bell_num:bell_num
                     });
                 }
             }
@@ -1284,7 +1330,8 @@ app.get("/setting_list", (req, res) => {
                             list_summary:list_summary,
                             contents:results,
                             header_icon: judge_function(),
-                            header_menu:sidemenu
+                            header_menu:sidemenu,
+                            bell_num:bell_num
                         });
                     }
                 }
@@ -1320,7 +1367,8 @@ app.get("/setting_contents", (req, res) => {
                     imageinfo:imageinfo,
                     listinfo:results,
                     header_icon: judge_function(),
-                    header_menu:sidemenu
+                    header_menu:sidemenu,
+                    bell_num:bell_num
                 });
             }
         });
@@ -1334,7 +1382,8 @@ app.get("/setting_password", (req, res) => {
         res.render('setting_password.ejs',
         {
             header_icon: judge_function(),
-            header_menu:sidemenu
+            header_menu:sidemenu,
+            bell_num:bell_num
         });
     }
 });
@@ -1355,7 +1404,8 @@ app.get("/tag_cloud", (req, res)=>{
             {
                 clouds:clouds,
                 header_icon: judge_function(),
-                header_menu:sidemenu
+                header_menu:sidemenu,
+                bell_num:bell_num
             });
         }
     });
@@ -1472,7 +1522,8 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
             error: re,
             form: {theme:req.body.theme},
             header_icon: judge_function(),
-            header_menu:sidemenu
+            header_menu:sidemenu,
+            bell_num:bell_num
         });
     } else {
         var theme = req.body.theme;
@@ -1485,11 +1536,17 @@ check('theme', 'テーマは必ず入力してください。').notEmpty(),
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
+        var notification_id
+        connection.query('SELECT account_id FROM follow where follow_id=?', account_id, function (error, results, fields){
+            notification_id=results
+        });
         connection.query(insert_contents, function (error, results, fields){
             if(tag!=''){
                 insert_tag(results.insertId, tag)
             }
-            upload_notification(results.insertId, theme, 'theme')
+            if(notification_id!=null){
+                upload_notification(results.insertId, theme, 'theme', notification_id)
+            }
             res.redirect('/tm'+results.insertId);
         });
         
@@ -1518,6 +1575,10 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
         var connection = mysql.createConnection(mysql_setting);
         
         connection.connect();
+        var notification_id
+        connection.query('SELECT account_id FROM follow where follow_id=?', account_id, function (error, results, fields){
+            notification_id=results
+        });
 
         var theme_account=0
         connection.query('SELECT account_id FROM theme where item_id=?',theme_id, function (error, results, fields){
@@ -1525,7 +1586,7 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
         });
 
         connection.query(insert_contents, function (error, results, fields){
-            upload_notification(results.insertId, title, 'image', theme_id)
+            upload_notification(results.insertId, title, 'image', notification_id)
             if(account_id!=theme_account){
                 upload_mytheme(results.insertId, theme_account)
             }
@@ -1594,8 +1655,9 @@ app.post('/comment',(req, res) => {
             +'visiter_id='+account_id
             +',visited_id=(SELECT account_id FROM image where item_id='+image_id
             +'),contents_id='+image_id
-            +',type="image",contents_post=false'
+            +',type="image",view=false'
             +', summary=(SELECT CONCAT(name, "さんがあなたのイラストにコメントしました。") FROM user_information where item_id='+account_id+')'
+            +',date=now()'
             connection.query(bell, function (error, results, fields){
             });
         }
@@ -1626,8 +1688,9 @@ app.post('/follow',(req, res) => {
         +'visiter_id='+account_id
         +',visited_id='+follow_id
         +',contents_id='+account_id
-        +',type="user",contents_post=false'
+        +',type="user",view=false'
         +', summary=(SELECT CONCAT(name, "さんがあなたをフォローしました。") FROM user_information where item_id='+account_id+')'
+        +',date=now()'
         connection.query(bell, function (error, results, fields){
         });
         connection.query('insert into follow set ?', data, function (error, results, fields){
@@ -1671,8 +1734,9 @@ app.post('/likes',(req, res) => {
             +'visiter_id='+account_id
             +',visited_id=(SELECT account_id FROM image where item_id='+contents_id
             +'),contents_id='+contents_id
-            +',type="image",contents_post=false'
-            +', summary=(SELECT CONCAT(name, "さんがあなたのイラストをいいねしました。") FROM user_information where item_id='+account_id+')'
+            +',type="image",view=false'
+            +',summary=(SELECT CONCAT(name, "さんがあなたのイラストをいいねしました。") FROM user_information where item_id='+account_id+')'
+            +',date=now()'
             connection.query(bell, function (error, results, fields){
             });
         }
@@ -1778,6 +1842,7 @@ app.post('/setting_image',(req, res) => {
     var image_id = req.body.image_id;
     var image_name = req.body.name;
     var image_title = req.body.title;
+    if(image_title==''){title='Untitled'}
     var image_contents = req.body.contents;
     var theme_id = req.body.theme_id;
 

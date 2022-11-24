@@ -27,7 +27,6 @@
 }
 .box1 li{
     border-top:solid 1px #777777;
-    padding: 10px 0px;
     background-color: #ffffff;
 }
 .box1 li:hover{
@@ -36,4 +35,11 @@
 .box1 a{
     text-decoration: none;
     color: #000000;
+}
+
+.box1 .never{
+    background-color: #fffadc;
+}
+.box1 .never:hover{
+    background-color: #fffdef;
 }

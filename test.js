@@ -182,14 +182,20 @@ function increase_follow(id, loop){
      }
 }
 
-function add_notification(visit_id, contents_id, type, contents_post, loop){
+function add_notification(visit_id, contents_id, type, loop){
      summary="testさんがあなたのイラストにいいねしました。"
      var connection = mysql.createConnection(mysql_setting);
       
      connection.connect();
      for(var i=0;i<loop;i++){
-          var data = {'visiter_id': i+1, 'visited_id':visit_id, 'contents_id':contents_id, 'type':type, 'contents_post':contents_post,'summary':summary}
-          connection.query('insert into notification set ?', data, function (error, results, fields){
+          const bell='insert into notification set '
+          +'visiter_id='+(i+1)
+          +',visited_id='+visit_id
+          +',contents_id='+contents_id
+          +',type="'+type+'",view=false'
+          +',summary='+summary
+          +',date=now()'
+          connection.query(bell, function (error, results, fields){
           });
      }
      connection.end();

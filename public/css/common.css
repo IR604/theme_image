@@ -10,7 +10,7 @@ span{
 }
 
 /*ヘッダ情報*/
-.boxA::after {
+.boxA::after, .header3::after {
     content: "";
     display: block;
     clear: both;
@@ -33,6 +33,23 @@ span{
     background-color: #ffee8f;
     padding-top: 10px;
     padding-bottom: 10px;
+}
+.other, .bell{float: right;
+    margin-left: 20px;
+}
+.bell{position: relative;
+}
+.bell_num{position: absolute;
+    background-color: #ff0000;
+    width: 15px;
+    height: 15px;
+    font-size: 11px;
+    text-align: center;
+    color: #ffffff;
+    right:-5px;
+    top:13px;
+    border-radius:50%;
+    font-weight: bold;
 }
 
 /*メニュー*/
