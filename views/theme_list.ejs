@@ -14,9 +14,9 @@
     <%- include('header')%>
     <div class="boxC">
         <div class="boxD">
-            <div class="box3-1">
+            <h2 class="box3-1">
                 <%=title%>
-            </div>
+            </h2>
             <div class="theme_box">
                 <% for(var i in themeinfo) { %>
                     <div class="theme_ichiran">
@@ -25,25 +25,19 @@
                                 <%=themeinfo[i].contents%>
                             </div>
                         </a>
-                        <a href="us<%-themeinfo[i].account_id%>">
+                        <a href="us<%=themeinfo[i].account_id%>">
                             <div class="theme_bottom">
                                 <div class="theme_icon">
-                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    <img src="images/icons/<%=themeinfo[i].account_id%>.jpg"  id="avatar" alt=""  width="50" height="50">
                                 </div>
                                 <div class="theme_name">
-                                    name
+                                    <%=themeinfo[i].username%>
                                 </div>
                             </div>
                         </a>
                     </div>
                 <% } %>
             </div>
-        </div>
-        <div class="split_contents">
-            <ul>
-                <a href=#1><li>1</li></a>
-                <a href=#2><li>2</li></a>
-            </ul>
         </div>
     </div>
     <div class="copyright">

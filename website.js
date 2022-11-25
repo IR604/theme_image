@@ -251,34 +251,30 @@ app.all("*", (req, res, next) => {
 
 // トップページ
 app.get("/", (req, res) => {
-    var msg = 'IR604'
-    var imagelink = '/image'
-    var akauntolink = '/akaunto'
     var imageinfo;
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" ,user_information.name AS "username"'
     +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
     +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             imageinfo = results
         }
     });
-    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+    connection.query('SELECT theme.*, SUM(A.likes) AS "likes", user_information.name AS username '
     +'FROM theme LEFT JOIN '
     +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
     +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+    +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
     +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
         if (error == null){
             res.render('index.ejs',
             {
                 title: 'ホームページ',
-                name: msg,
                 themeinfo: results,
                 imageinfo: imageinfo,
-                imagelink: imagelink,
-                akauntolink: akauntolink,
                 header_icon: judge_function(),
                 header_menu:sidemenu,
                 bell_num:bell_num
@@ -303,18 +299,10 @@ app.get("/making_account", (req, res) => {
         title: 'ホームページ'
     });
 });
-// 確認コード入力ページ
-app.get("/enter_code", (req, res) => {
-    res.render('account_code.ejs',
-    {
-        title: 'ホームページ'
-    });
-});
 
 // imageページ
 app.get("/im:imagelink", (req, res) => {
     var imagelink = req.params.imagelink
-    var msg = 'IR604'
     var sametheme;
     var connection_image;
     var comments;
@@ -403,23 +391,27 @@ app.get("/im:imagelink", (req, res) => {
     });
 
     // コメント
-    connection.query('SELECT *, comment.summary as su1 FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=? ORDER BY comment.item_id desc',imagelink ,function (error, results, fields){
+    connection.query('SELECT comment.*, user_information.name AS name FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=? ORDER BY comment.item_id desc',imagelink ,function (error, results, fields){
         if (error == null){
             comments=results;
         }
     });
 
     // 同テーマのイラスト
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id = (SELECT theme_id FROM image WHERE item_id= ?) GROUP BY item_id ORDER BY likes desc',imagelink ,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'WHERE theme_id = (SELECT theme_id FROM image WHERE item_id= ?) GROUP BY item_id ORDER BY likes desc',imagelink ,function (error, results, fields){
         if (error == null){
             sametheme=results;
         }
     });
 
     // 関連イラスト
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN '
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'WHERE theme_id IN (SELECT theme_id FROM tags WHERE tag IN '
     +'(SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
     ,imagelink ,function (error, results, fields){
         if (error == null){
@@ -456,7 +448,6 @@ app.get("/im:imagelink", (req, res) => {
             }
             res.render('sample.ejs',
             {
-                name: msg,
                 comments: comments,
                 imageinfo: results[0],
                 sametheme:sametheme,
@@ -478,8 +469,6 @@ app.get("/im:imagelink", (req, res) => {
 // themeページ
 app.get("/tm:themelink", (req, res) => {
     var themelink = req.params.themelink
-    var msg = 'IR604'
-    var akauntolink = '/us1'
     var imageinfo;
     var connection_theme;
     var judgeresult = 0
@@ -520,8 +509,10 @@ app.get("/tm:themelink", (req, res) => {
         }
     });
     
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id where theme_id= ? GROUP BY item_id ORDER BY likes desc'
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'where theme_id= ? GROUP BY item_id ORDER BY likes desc'
     , themelink,function (error, results, fields){
         if (error == null){
             imageinfo=results
@@ -529,10 +520,11 @@ app.get("/tm:themelink", (req, res) => {
     });
 
     // 関連テーマ
-    connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+    connection.query('SELECT theme.*, SUM(A.likes) AS "likes", user_information.name AS username '
     +'FROM theme LEFT JOIN '
     +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
     +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+    +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
     +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
     +'GROUP BY theme.item_id ORDER BY likes desc'
     , themelink,function (error, results, fields){
@@ -569,8 +561,6 @@ app.get("/tm:themelink", (req, res) => {
             }
             res.render('theme_page.ejs',
             {
-                akauntolink: akauntolink,
-                name: msg,
                 themeinfo: results[0],
                 imageinfo: imageinfo,
                 connection_theme: connection_theme,
@@ -603,7 +593,9 @@ app.get("/list:listlink", (req, res) => {
     });
 
     
-    connection.query('SELECT theme.*, list_contents.item_id AS list_id FROM theme INNER JOIN list_contents ON theme.item_id=list_contents.contents_id '
+    connection.query('SELECT theme.*, list_contents.item_id AS list_id, user_information.name AS username FROM theme '
+    +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
+    +'INNER JOIN list_contents ON theme.item_id=list_contents.contents_id '
     +'where list_contents.list_id=? ORDER BY list_id desc',listlink,function (error, results, fields){
         if (error == null){
             if(judge=='theme'){
@@ -618,7 +610,9 @@ app.get("/list:listlink", (req, res) => {
             }
         }
     });
-    connection.query('SELECT image.*, list_contents.item_id AS list_id FROM image INNER JOIN list_contents ON image.item_id=list_contents.contents_id '
+    connection.query('SELECT image.*, list_contents.item_id AS list_id, user_information.name AS username FROM image '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'INNER JOIN list_contents ON image.item_id=list_contents.contents_id '
     +'where list_contents.list_id=? ORDER BY list_id desc',listlink,function (error, results, fields){
         if (error == null){
             if(judge=='image'){
@@ -642,10 +636,11 @@ app.get("/topic", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
     connection.connect();
     if(type=='theme'){
-        connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+        connection.query('SELECT theme.*, SUM(A.likes) AS "likes", user_information.name AS username '
         +'FROM theme LEFT JOIN '
         +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
         +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+        +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
         +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY theme.item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('theme_list.ejs',
@@ -659,8 +654,9 @@ app.get("/topic", (req, res) => {
             }
         });
     }else if(type=='image'){
-        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
+        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
         +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+        +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
         +'WHERE DATEDIFF(CURRENT_DATE(),date)<30 GROUP BY item_id ORDER BY likes desc',function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
@@ -685,8 +681,10 @@ app.get("/theme_image", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id where theme_id= ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+    +'from image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'where theme_id= ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
             res.render('image_list.ejs',
             {
@@ -707,8 +705,10 @@ app.get("/same_image", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id = ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
+    connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+    +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+    +'WHERE theme_id = ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
             res.render('image_list.ejs',
             {
@@ -729,8 +729,10 @@ app.get("/likes", (req, res) => {
     }else{
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
-        connection.query('SELECT image.*, likes.item_id AS "likes_id" '
-        +'FROM image INNER JOIN likes ON image.item_id=likes.contents_id WHERE likes.account_id = ? ORDER BY likes_id desc',account_id,function (error, results, fields){
+        connection.query('SELECT image.*, likes.item_id AS "likes_id", user_information.name AS username '
+        +'FROM image INNER JOIN likes ON image.item_id=likes.contents_id '
+        +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+        +'WHERE likes.account_id = ? ORDER BY likes_id desc',account_id,function (error, results, fields){
             if (error == null){
                 res.render('image_list.ejs',
                 {
@@ -755,7 +757,9 @@ app.get("/follow_content", (req, res) => {
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
         if(type=='theme'){
-            connection.query('SELECT * FROM theme WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+            connection.query('SELECT theme.*, user_information.name AS username FROM theme '
+            +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
+            +'WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
                 if (error == null){
                     res.render('theme_list.ejs',
                     {
@@ -768,7 +772,9 @@ app.get("/follow_content", (req, res) => {
                 }
             });
         }else if(type=='image'){
-            connection.query('SELECT * FROM image WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
+            connection.query('SELECT image.*, user_information.name AS username FROM image '
+            +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+            +'WHERE account_id IN (SELECT follow_id FROM follow where account_id = ?) ORDER BY item_id desc',account_id,function (error, results, fields){
                 if (error == null){
                     res.render('image_list.ejs',
                     {
@@ -793,10 +799,11 @@ app.get("/connection", (req, res) => {
 
     connection.connect();
     if(type=='theme'){
-        connection.query('SELECT theme.*, SUM(A.likes) AS "likes" '
+        connection.query('SELECT theme.*, SUM(A.likes) AS "likes", user_information.name AS username '
         +'FROM theme LEFT JOIN '
         +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
         +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id GROUP BY item_id) A ON theme.item_id=A.theme '
+        +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
         +'where theme.item_id IN (SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=?)) '
         +'GROUP BY theme.item_id ORDER BY likes desc',id,function (error, results, fields){
             if (error == null){
@@ -811,8 +818,10 @@ app.get("/connection", (req, res) => {
             }
         });
     }else if(type=='image'){
-        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
-        +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id WHERE theme_id IN '
+        connection.query('SELECT image.*, SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes", user_information.name AS username '
+        +'FROM image LEFT JOIN likes ON image.item_id=likes.contents_id '
+        +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
+        +'WHERE theme_id IN '
         +'(SELECT theme_id FROM tags WHERE tag IN (SELECT tag FROM tags WHERE theme_id=(SELECT theme_id FROM image where item_id=?))) GROUP BY item_id ORDER BY likes desc'
         ,id,function (error, results, fields){
             if (error == null){
@@ -836,7 +845,6 @@ app.get("/us:akauntolink", (req, res) => {
     var themeinfo;
     var imageinfo;
     var listinfo;
-    var name = 'ir604'
     var judgement
     var follow;
     var follower;
@@ -932,7 +940,6 @@ app.get("/us:akauntolink", (req, res) => {
                 themeinfo:themeinfo,
                 imageinfo:imageinfo,
                 listinfo:listinfo,
-                name:name,
                 judgement:judgement,
                 follow: follow,
                 follower: follower,
@@ -997,7 +1004,6 @@ app.get("/research", (req, res) => {
 
     var word_split=word.split(/[ 　.\[\]*+?|^$\(\)\{\}-]/)
     var title = word + 'の検索結果'
-    var name = 'ir604'
     var imageinfo;
     var userinfo;
 
@@ -1016,11 +1022,15 @@ app.get("/research", (req, res) => {
         }
     }
     
-    var DB_result_theme='SELECT DISTINCT theme.* from theme LEFT JOIN tags ON theme.item_id=tags.theme_id '
+    var DB_result_theme='SELECT DISTINCT theme.*, user_information.name AS username from theme '
+    +'LEFT JOIN tags ON theme.item_id=tags.theme_id '
+    +'LEFT JOIN user_information ON theme.account_id=user_information.item_id '
     +'where theme.contents '+research_words
     +'or tags.tag '+research_words
     +'ORDER by item_id desc'
-    var DB_result_image='SELECT DISTINCT image.* from image LEFT JOIN tags ON image.theme_id=tags.theme_id '
+    var DB_result_image='SELECT DISTINCT image.*, user_information.name AS username from image '
+    +'LEFT JOIN tags ON image.theme_id=tags.theme_id '
+    +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
     +'where image.title '+research_words
     +'or image.contents '+research_words
     +'or tags.tag '+research_words
@@ -1052,7 +1062,6 @@ app.get("/research", (req, res) => {
                 title: title,
                 search: Search_ber,
                 setting:setting,
-                name:name,
                 themeinfo: results,
                 imageinfo: imageinfo,
                 userinfo: userinfo,
@@ -1607,6 +1616,7 @@ app.post('/illustupload',upload.single('file'),(req, res) => {
 // リスト作成処理
 app.post('/create_list',(req, res) => {
     var title = req.body.title;
+    if(title==''){title='Untitled'}
     var type = req.body.type;
     var data = {'title':title, 'type':type, 'account_id': account_id}
 
@@ -1860,6 +1870,7 @@ app.post('/setting_image',(req, res) => {
 app.post('/setting_list',(req, res) => {
     var list_id = req.body.list_id;
     var title = req.body.title;
+    if(title==''){title='Untitled'}
     var type = req.body.type;
 
     var connection = mysql.createConnection(mysql_setting);

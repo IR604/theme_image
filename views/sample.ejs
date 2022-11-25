@@ -82,7 +82,7 @@
                     </div>
                     <div class="box5-5">
                         <div class="box5-icon">
-                            <img src="images/icons/icon.png"  id="avatar" alt=""  width="70" height="70">
+                            <img src="images/icons/<%=imageinfo.account_id%>.jpg"  id="avatar" alt=""  width="70" height="70">
                         </div>
                         <div class="box5-name">
                             <a href="us<%-imageinfo.account_id%>"><%-imageinfo.username%></a>
@@ -110,14 +110,16 @@
                         <% for(var i in comments) { %>
                             <div class="comment">
                                 <div class="comment-icon">
-                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    <a href="/us<%=comments[i].account_id%>">
+                                        <img src="images/icons/<%=comments[i].account_id%>.jpg"  id="avatar" alt=""  width="50" height="50">
+                                    </a>
                                 </div>
                                 <div class="comment-left">
                                     <div class="comment-name">
                                         <strong><%=comments[i].name%></strong>
                                     </div>
                                     <div class="comment-contents">
-                                        <%=comments[i].su1%>
+                                        <%=comments[i].summary%>
                                     </div>
                                 </div>
                             </div>
@@ -127,9 +129,9 @@
                 </div>
             </div>
             <div class="boxB-2">
-                <div class="box7">
+                <h2 class="box7">
                     <a href="/same_image?id=<%-imageinfo.theme_id%>">同テーマのイラスト
-                </div>
+                </h2>
                 <div class="box8">
                     <% for(var i in sametheme) { %>
                         <div class="same_ichiran">
@@ -144,10 +146,10 @@
                             <a href="us<%-sametheme[i].account_id%>">
                                 <div class="theme_bottom">
                                     <div class="theme_icon">
-                                        <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                        <img src="images/icons/<%=sametheme[i].account_id%>.jpg"  id="avatar" alt=""  width="50" height="50">
                                     </div>
                                     <div class="theme_name">
-                                        <%-name%>
+                                        <%=sametheme[i].username%>
                                     </div>
                                 </div>
                             </a>
@@ -157,9 +159,9 @@
             </div>
         </div>
         <div class="box9">
-            <div class="box9-1">
+            <h2 class="box9-1">
                 <a href="connection?id=<%-imageinfo.item_id%>&type=image">関連イラスト</a>
-            </div>
+            </h2>
             <div class="image_box">
                 <% for(var i in connection_image) { %>
                     <div class="image_ichiran">
@@ -174,10 +176,10 @@
                         <a href="us<%-connection_image[i].account_id%>">
                             <div class="theme_bottom">
                                 <div class="theme_icon">
-                                    <img src="images/icons/icon.png"  id="avatar" alt=""  width="50" height="50">
+                                    <img src="images/icons/<%=connection_image[i].account_id%>.jpg"  id="avatar" alt=""  width="50" height="50">
                                 </div>
                                 <div class="theme_name">
-                                    name
+                                    <%=connection_image[i].username%>
                                 </div>
                             </div>
                         </a>
