@@ -23,7 +23,7 @@
                     </div>
                 </a>
                 <div class="box4">
-                    <img src="images/images/<%-imageinfo.name%>" width="100%" height="100%">
+                    <img src="images/images/<%-imageinfo.name%>" id="images">
                 </div>
                 <div class="box5">
                     <div class="box5-1">
@@ -47,10 +47,6 @@
                                             <li><a href="https://twitter.com/intent/tweet?text=[テキスト]&url=[URL]&via=[アカウント]" onclick="window.open(this.href, 'SNS', 'width=500, height=300, menubar=no, toolbar=no, scrollbars=yes'); return false;" class="share-tw">
                                                 <i class="fa fa-twitter"></i>
                                                 Twitterでシェア
-                                            </a></li>
-                                            <li><a href="http://www.facebook.com/share.php?u=[URL]" onclick="window.open(this.href, 'SNS', 'width=500, height=500, menubar=no, toolbar=no, scrollbars=yes'); return false;" class="share-fb">
-                                                <i class="fa fa-facebook"></i>
-                                                Facebookでシェア
                                             </a></li>
                                         </ul>
                                     </div>
@@ -137,7 +133,7 @@
                         <div class="same_ichiran">
                             <a href="im<%-sametheme[i].item_id%>">
                                 <div class="image_top">
-                                    <img src="images/images/<%-sametheme[i].name%>" width="100%" height="100%">
+                                    <img src="images/images/<%-sametheme[i].name%>" id="thumbnail">
                                 </div>
                                 <div class="image_top2">
                                     <%-sametheme[i].title%>
@@ -167,7 +163,7 @@
                     <div class="image_ichiran">
                         <a href="im<%-connection_image[i].item_id%>">
                             <div class="image_top">
-                                <img src="images/images/<%-connection_image[i].name%>" width="100%" height="100%">
+                                <img src="images/images/<%-connection_image[i].name%>" id="thumbnail">
                             </div>
                             <div class="image_top2">
                                 <%-connection_image[i].title%>

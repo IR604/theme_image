@@ -202,13 +202,19 @@ function add_notification(visit_id, contents_id, type, loop){
 }
 
 
-function public_user(){
-     var data = {'name': 'name', 'summary':'sample', 'uid': 'XXX'}
+function public_user(type){
+     var names = ['バナナの皮', '男性A', '灰色猫'];
+     var summarys = ['誰かが捨てていったバナナの皮です'
+     , 'その辺にいる普通の男性です。'
+     , 'ロシアンブルーです。嫉妬深い一面があるけど、愛嬌は抜群です'];
+     var items = ['dummy1.png', 'dummy2.png', 'dummy3.png'];
+
+     var data = {'name': names[type], 'summary':summarys[type], 'uid': 'XXX'}
 
      var connection = mysql.createConnection(mysql_setting);
      connection.connect(); 
      connection.query('insert into user_information set ?', data, function (error, results, fields){
-          fs.copyFile('./public/images/icons/default_icon.jpg', './public/images/icons/'+results.insertId+'.jpg', (err) => {
+          fs.copyFile('./public/images/icons/'+items[type], './public/images/icons/'+results.insertId+'.jpg', (err) => {
                if (err) {
                    console.log(err.stack);
                }
@@ -217,7 +223,7 @@ function public_user(){
                }
            });
 
-           fs.copyFile('./public/images/header/default_header.jpg', './public/images/header/'+results.insertId+'.jpg', (err) => {
+           fs.copyFile('./public/images/header/'+items[type], './public/images/header/'+results.insertId+'.jpg', (err) => {
                if (err) {
                    console.log(err.stack);
                }
@@ -323,4 +329,7 @@ function all(id){
       
      connection.end();
 }
+public_user(0)
+public_user(1)
+public_user(2)
 all('tags')

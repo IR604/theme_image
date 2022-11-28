@@ -19,7 +19,10 @@ span{
     width: 20%;
 }
 .header1-1	{float: left;
-    width: 50%;
+    width: 20%;
+}
+.header1-2	{float: left;
+    width: 80%;
 }
 .header2	{float: left;
     text-align:center;
@@ -232,6 +235,7 @@ summary.menuber{
 .image_top{width: 100%;
     height: 200px;
     background-color: #ffffff;
+    overflow: hidden;
 }
 .image_top2{width: 100%;
     height: 25px;
@@ -255,4 +259,10 @@ summary.menuber{
     width: 100%;
     color: #727272;
     background-color: #e6e6e6;
+}
+
+#thumbnail{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
