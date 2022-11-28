@@ -340,7 +340,9 @@ app.get("/im:imagelink", (req, res) => {
     connection.query('SELECT account_id from image where item_id= ?'
     ,imagelink,function (error, results, fields){
         if (error == null){
-            user_id=results[0].account_id;
+            if(results[0]!=null){
+                user_id=results[0].account_id;
+            }
         }
     });
     connection.query('SELECT * from likes where contents_id= ? and account_id= ?'
@@ -426,41 +428,47 @@ app.get("/im:imagelink", (req, res) => {
         }
     });
 
-    connection.query('SELECT image.*, theme.contents as c2, user_information.name as username from image INNER JOIN theme ON image.theme_id=theme.item_id INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
+    connection.query('SELECT image.*, (CASE WHEN theme.contents IS Null THEN "【このテーマは削除されました】" ELSE theme.contents END) as c2, '
+    +'user_information.name as username from image '
+    +'LEFT JOIN theme ON image.theme_id=theme.item_id '
+    +'INNER JOIN user_information ON image.account_id=user_information.item_id where image.item_id=?',
     imagelink ,function (error, results, fields){
         if (error == null){
             var judgement
-
-            if (results[0].account_id==account_id){
-                judgement='';
-            }else if (judgeresult==0){
-                judgement='<form action="/follow" method="post">'
-                +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
-                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
-                +'<input type="submit" value="フォロー" class="follow-button">'
-                +'</form>';
+            if(results[0]==null){
+                res.redirect('/')
             }else{
-                judgement='<form action="/deletefollow" method="post">'
-                +'<input type="hidden" name="id" value="'+follow_id+'">'
-                +'<input type="hidden" name="link" value="/im'+imagelink+'">'
-                +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
-                +'</form>';
+                if (results[0].account_id==account_id){
+                    judgement='';
+                }else if (judgeresult==0){
+                    judgement='<form action="/follow" method="post">'
+                    +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
+                    +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                    +'<input type="submit" value="フォロー" class="follow-button">'
+                    +'</form>';
+                }else{
+                    judgement='<form action="/deletefollow" method="post">'
+                    +'<input type="hidden" name="id" value="'+follow_id+'">'
+                    +'<input type="hidden" name="link" value="/im'+imagelink+'">'
+                    +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
+                    +'</form>';
+                }
+                res.render('sample.ejs',
+                {
+                    comments: comments,
+                    imageinfo: results[0],
+                    sametheme:sametheme,
+                    connection_image:connection_image,
+                    tag: tag,
+                    judgement: judgement,
+                    likejudge: likejudge,
+                    like:like,
+                    list_add: list_add,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu,
+                    bell_num:bell_num
+                });
             }
-            res.render('sample.ejs',
-            {
-                comments: comments,
-                imageinfo: results[0],
-                sametheme:sametheme,
-                connection_image:connection_image,
-                tag: tag,
-                judgement: judgement,
-                likejudge: likejudge,
-                like:like,
-                list_add: list_add,
-                header_icon: judge_function(),
-                header_menu:sidemenu,
-                bell_num:bell_num
-            });
         }
     });
     connection.end();
@@ -543,34 +551,37 @@ app.get("/tm:themelink", (req, res) => {
     connection.query('SELECT theme.*, user_information.name as username from theme INNER JOIN user_information ON theme.account_id=user_information.item_id where theme.item_id=?',themelink ,function (error, results, fields){
         if (error == null){
             var judgement
-            
-            if (results[0].account_id==account_id){
-                judgement='';
-            }else if(judgeresult==0){
-                judgement='<form action="/follow" method="post">'
-                +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
-                +'<input type="hidden" name="link" value="/tm'+themelink+'">'
-                +'<input type="submit" value="フォロー" class="follow-button">'
-                +'</form>';
+            if(results[0]==null){
+                res.redirect('/')
             }else{
-                judgement='<form action="/deletefollow" method="post">'
-                +'<input type="hidden" name="id" value="'+follow_id+'">'
-                +'<input type="hidden" name="link" value="/tm'+themelink+'">'
-                +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
-                +'</form>';
+                if (results[0].account_id==account_id){
+                    judgement='';
+                }else if(judgeresult==0){
+                    judgement='<form action="/follow" method="post">'
+                    +'<input type="hidden" name="id" value="'+results[0].account_id+'">'
+                    +'<input type="hidden" name="link" value="/tm'+themelink+'">'
+                    +'<input type="submit" value="フォロー" class="follow-button">'
+                    +'</form>';
+                }else{
+                    judgement='<form action="/deletefollow" method="post">'
+                    +'<input type="hidden" name="id" value="'+follow_id+'">'
+                    +'<input type="hidden" name="link" value="/tm'+themelink+'">'
+                    +'<input type="submit" value="フォロー解除" class="deletefollow-button">'
+                    +'</form>';
+                }
+                res.render('theme_page.ejs',
+                {
+                    themeinfo: results[0],
+                    imageinfo: imageinfo,
+                    connection_theme: connection_theme,
+                    tag: tag,
+                    judgement: judgement,
+                    list_add: list_add,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu,
+                    bell_num:bell_num
+                });
             }
-            res.render('theme_page.ejs',
-            {
-                themeinfo: results[0],
-                imageinfo: imageinfo,
-                connection_theme: connection_theme,
-                tag: tag,
-                judgement: judgement,
-                list_add: list_add,
-                header_icon: judge_function(),
-                header_menu:sidemenu,
-                bell_num:bell_num
-            });
         }
     });
     connection.end();
@@ -587,8 +598,12 @@ app.get("/list:listlink", (req, res) => {
     var title=''
     connection.query('SELECT type, title from lists where item_id=?',listlink,function (error, results, fields){
         if (error == null){
-            judge=results[0].type
-            title=results[0].title
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                judge=results[0].type
+                title=results[0].title
+            }
         }
     });
 
@@ -615,7 +630,7 @@ app.get("/list:listlink", (req, res) => {
     +'INNER JOIN list_contents ON image.item_id=list_contents.contents_id '
     +'where list_contents.list_id=? ORDER BY list_id desc',listlink,function (error, results, fields){
         if (error == null){
-            if(judge=='image'){
+           if(judge=='image'){
                 res.render('image_list.ejs',
                 {
                     title: title,
@@ -677,6 +692,9 @@ app.get("/topic", (req, res) => {
 // 各テーマで投稿されたイラスト
 app.get("/theme_image", (req, res) => {
     var theme_id=req.query.id
+    if(theme_id==null){
+        res.redirect('/')
+    }
 
     var connection = mysql.createConnection(mysql_setting);
 
@@ -686,14 +704,18 @@ app.get("/theme_image", (req, res) => {
     +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
     +'where theme_id= ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
-            res.render('image_list.ejs',
-            {
-                title:'投稿されたイラスト',
-                imageinfo: results,
-                header_icon: judge_function(),
-                header_menu:sidemenu,
-                bell_num:bell_num
-            });
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                res.render('image_list.ejs',
+                {
+                    title:'投稿されたイラスト',
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu,
+                    bell_num:bell_num
+                });
+            }
         }
     });
     connection.end();
@@ -701,6 +723,9 @@ app.get("/theme_image", (req, res) => {
 // 同テーマのイラスト
 app.get("/same_image", (req, res) => {
     var theme_id=req.query.id
+    if(theme_id==null){
+        res.redirect('/')
+    }
 
     var connection = mysql.createConnection(mysql_setting);
 
@@ -710,14 +735,18 @@ app.get("/same_image", (req, res) => {
     +'LEFT JOIN user_information ON image.account_id=user_information.item_id '
     +'WHERE theme_id = ? GROUP BY item_id ORDER BY likes desc',theme_id,function (error, results, fields){
         if (error == null){
-            res.render('image_list.ejs',
-            {
-                title:'同テーマのイラスト',
-                imageinfo: results,
-                header_icon: judge_function(),
-                header_menu:sidemenu,
-                bell_num:bell_num
-            });
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                res.render('image_list.ejs',
+                {
+                    title:'同テーマのイラスト',
+                    imageinfo: results,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu,
+                    bell_num:bell_num
+                });
+            }
         }
     });
     connection.end();
@@ -786,6 +815,8 @@ app.get("/follow_content", (req, res) => {
                     });
                 }
             });
+        }else{
+            res.redirect('/')
         }
         connection.end();
     }
@@ -798,7 +829,11 @@ app.get("/connection", (req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
+    if(id==null){
+        res.redirect('/')
+    }
     if(type=='theme'){
+        
         connection.query('SELECT theme.*, SUM(A.likes) AS "likes", user_information.name AS username '
         +'FROM theme LEFT JOIN '
         +'(SELECT image.item_id, image.theme_id AS "theme", SUM(CASE WHEN likes.item_id IS Null THEN 0 ELSE 1 END) AS "likes" '
@@ -835,6 +870,8 @@ app.get("/connection", (req, res) => {
                 });
             }
         });
+    }else{
+        res.redirect('/')
     }
     connection.end();
 });
@@ -934,20 +971,24 @@ app.get("/us:akauntolink", (req, res) => {
 
     connection.query('SELECT * from user_information where item_id=?',akauntolink ,function (error, results, fields){
         if (error == null){
-            res.render('akaunto.ejs',
-            {
-                akauntoinfo: results[0],
-                themeinfo:themeinfo,
-                imageinfo:imageinfo,
-                listinfo:listinfo,
-                judgement:judgement,
-                follow: follow,
-                follower: follower,
-                make_list: make_list,
-                header_icon: judge_function(),
-                header_menu:sidemenu,
-                bell_num:bell_num
-            });
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                res.render('akaunto.ejs',
+                {
+                    akauntoinfo: results[0],
+                    themeinfo:themeinfo,
+                    imageinfo:imageinfo,
+                    listinfo:listinfo,
+                    judgement:judgement,
+                    follow: follow,
+                    follower: follower,
+                    make_list: make_list,
+                    header_icon: judge_function(),
+                    header_menu:sidemenu,
+                    bell_num:bell_num
+                });
+            }
         }
     });
     connection.end();
@@ -974,20 +1015,27 @@ app.get("/illustupload", (req, res) => {
         res.redirect('/login');
     }else{
         var themeid = req.query.id
+        if(themeid==null){
+            res.redirect('/')
+        }
         
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();    
         connection.query('SELECT contents from theme where item_id=?',themeid ,function (error, results, fields){
             if (error == null){
-                res.render('image_upload.ejs',
-                {
-                    themeid: themeid,
-                    themename: results[0],
-                    header_icon: judge_function(),
-                    header_menu:sidemenu,
-                    bell_num:bell_num
-                });
+                if(results[0]==null){
+                    res.redirect('/')
+                }else{
+                    res.render('image_upload.ejs',
+                    {
+                        themeid: themeid,
+                        themename: results[0],
+                        header_icon: judge_function(),
+                        header_menu:sidemenu,
+                        bell_num:bell_num
+                    });
+                }
             }
         });
         connection.end();
@@ -1103,6 +1151,9 @@ app.get("/notification", (req, res) => {
 // フォロー一覧
 app.get("/follow", (req, res) => {
     var user_id = req.query.id;
+    if(user_id==null){
+        res.redirect('/')
+    }
 
     var title=''
 
@@ -1111,7 +1162,11 @@ app.get("/follow", (req, res) => {
     connection.connect();
     connection.query('SELECT name from user_information where item_id=?',user_id ,function (error, results, fields){
         if (error == null){
-            title=results[0].name+'がフォローしたユーザー'
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                title=results[0].name+'がフォローしたユーザー'
+            }
         }
     });
 
@@ -1133,6 +1188,9 @@ app.get("/follow", (req, res) => {
 // フォロワー一覧
 app.get("/follower", (req, res) => {
     var user_id = req.query.id;
+    if(user_id==null){
+        res.redirect('/')
+    }
 
     var title=''
 
@@ -1141,7 +1199,11 @@ app.get("/follower", (req, res) => {
     connection.connect();
     connection.query('SELECT name from user_information where item_id=?',user_id ,function (error, results, fields){
         if (error == null){
-            title=results[0].name+'をフォローしたユーザー'
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                title=results[0].name+'をフォローしたユーザー'
+            }
         }
     });
     
@@ -1163,6 +1225,9 @@ app.get("/follower", (req, res) => {
 // いいねユーザー一覧
 app.get("/likes_user", (req, res) => {
     var image_id = req.query.id;
+    if(image_id==null){
+        res.redirect('/')
+    }
 
     var title=''
 
@@ -1171,7 +1236,11 @@ app.get("/likes_user", (req, res) => {
     connection.connect();
     connection.query('SELECT title from image where item_id=?',image_id ,function (error, results, fields){
         if (error == null){
-            title=results[0].title+'をいいねしたユーザー'
+            if(results[0]==null){
+                res.redirect('/')
+            }else{
+                title=results[0].title+'をいいねしたユーザー'
+            }
         }
     });
 
@@ -1201,7 +1270,11 @@ app.get("/comments", (req, res) => {
 
     connection.connect();
     connection.query('SELECT * FROM image where item_id=?',image_id ,function (error, results, fields){
-        imageinfo=results[0]
+        if(image_id==null||results[0]==null){
+            res.redirect('/')
+        }else{
+            imageinfo=results[0]
+        }
     });
     connection.query('SELECT comment.*, user_information.name as name FROM comment INNER JOIN user_information ON comment.account_id=user_information.item_id where image_id=? ORDER BY item_id desc',image_id ,function (error, results, fields){
         if (error == null){
@@ -1245,6 +1318,9 @@ app.get("/setting_theme", (req, res) => {
         res.redirect('/login')
     }else{
         var theme_id=req.query.id
+        if(theme_id==null){
+            res.redirect('/setting_contents')
+        }
 
         var tags=''
 
@@ -1259,14 +1335,20 @@ app.get("/setting_theme", (req, res) => {
 
         connection.query('SELECT * FROM theme where item_id=?',theme_id,function (error, results, fields){
             if (error == null){
-                res.render('setting_theme.ejs',
-                {
-                    themeinfo:results[0],
-                    tags:tags,
-                    header_icon: judge_function(),
-                    header_menu:sidemenu,
-                    bell_num:bell_num
-                });
+                if(results[0]==null){
+                    res.redirect('/setting_contents')
+                }else if(results[0].account_id==account_id){
+                    res.render('setting_theme.ejs',
+                    {
+                        themeinfo:results[0],
+                        tags:tags,
+                        header_icon: judge_function(),
+                        header_menu:sidemenu,
+                        bell_num:bell_num
+                    });
+                }else{
+                    res.redirect('/setting_contents')
+                }
             }
         });
         connection.end();
@@ -1277,19 +1359,28 @@ app.get("/setting_image", (req, res) => {
         res.redirect('/login')
     }else{
         var image_id=req.query.id
+        if(image_id==null){
+            res.redirect('/setting_contents')
+        }
 
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
         connection.query('SELECT * FROM image where item_id=?',image_id,function (error, results, fields){
             if (error == null){
-                res.render('setting_image.ejs',
-                {
-                    imageinfo:results[0],
-                    header_icon: judge_function(),
-                    header_menu:sidemenu,
-                    bell_num:bell_num
-                });
+                if(results[0]==null){
+                    res.redirect('/setting_contents')
+                }else if(results[0].account_id==account_id){
+                    res.render('setting_image.ejs',
+                    {
+                        imageinfo:results[0],
+                        header_icon: judge_function(),
+                        header_menu:sidemenu,
+                        bell_num:bell_num
+                    });
+                }else{
+                    res.redirect('/setting_contents')
+                }
             }
         });
         connection.end();
@@ -1300,6 +1391,9 @@ app.get("/setting_list", (req, res) => {
         res.redirect('/login')
     }else{
         var list_id=req.query.id
+        if(list_id==null){
+            res.redirect('/setting_contents')
+        }
 
         var judge
         var list_summary
@@ -1309,8 +1403,12 @@ app.get("/setting_list", (req, res) => {
         connection.connect();
         connection.query('SELECT * from lists where item_id=?',list_id,function (error, results, fields){
             if (error == null){
-                judge=results[0].type
-                list_summary=results[0]
+                if(results[0]==null){
+                    res.redirect('/setting_contents')
+                }else{
+                    judge=results[0].type
+                    list_summary=results[0]
+                }
             }
         });
         
@@ -1318,15 +1416,19 @@ app.get("/setting_list", (req, res) => {
         +'where list_contents.list_id=? ORDER BY list_id desc',list_id,function (error, results, fields){
             if (error == null){
                 if(judge=='theme'){
-                    res.render('setting_list_theme.ejs',
-                    {
-                        
-                        list_summary:list_summary,
-                        contents:results,
-                        header_icon: judge_function(),
-                        header_menu:sidemenu,
-                        bell_num:bell_num
-                    });
+                    if(list_summary.account_id==account_id){
+                        res.render('setting_list_theme.ejs',
+                        {
+                            
+                            list_summary:list_summary,
+                            contents:results,
+                            header_icon: judge_function(),
+                            header_menu:sidemenu,
+                            bell_num:bell_num
+                        });
+                    }else{
+                        res.redirect('/setting_contents')
+                    }
                 }
             }
         });
@@ -1334,14 +1436,18 @@ app.get("/setting_list", (req, res) => {
             +'where list_contents.list_id=? ORDER BY list_id desc',list_id,function (error, results, fields){
                 if (error == null){
                     if(judge=='image'){
-                        res.render('setting_list_image.ejs',
-                        {
-                            list_summary:list_summary,
-                            contents:results,
-                            header_icon: judge_function(),
-                            header_menu:sidemenu,
-                            bell_num:bell_num
-                        });
+                        if(list_summary.account_id==account_id){
+                            res.render('setting_list_image.ejs',
+                            {
+                                list_summary:list_summary,
+                                contents:results,
+                                header_icon: judge_function(),
+                                header_menu:sidemenu,
+                                bell_num:bell_num
+                            });
+                        }else{
+                            res.redirect('/setting_contents')
+                        }
                     }
                 }
             });
