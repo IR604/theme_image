@@ -9,7 +9,7 @@ app.use(express.static('public'));
 
 var multer = require('multer');
 var filename='';
-var account_id=1;
+var account_id=0;
 var storage = multer.diskStorage({
     //ファイルの保存先を指定
     destination: function(req, file, cb){

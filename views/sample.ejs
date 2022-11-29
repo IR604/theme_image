@@ -36,23 +36,6 @@
                         <div class="box5-2-another">
                             <a href="/likes_user?id=<%-imageinfo.item_id%>" class="likes_count"><%-like%></a>
                         </div>
-                        <div class="box5-2-another">
-                            <details>
-                                <summary class="menuber">
-                                    <span class="material-symbols-outlined">ios_share</span>
-                                </summary>
-                                <div class="setting_summary">
-                                    <div class="share">
-                                        <ul>
-                                            <li><a href="https://twitter.com/intent/tweet?text=[テキスト]&url=[URL]&via=[アカウント]" onclick="window.open(this.href, 'SNS', 'width=500, height=300, menubar=no, toolbar=no, scrollbars=yes'); return false;" class="share-tw">
-                                                <i class="fa fa-twitter"></i>
-                                                Twitterでシェア
-                                            </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </details>
-                        </div>
                         <div class="list_add">
                             <details>
                                 <summary class="menuber">
@@ -150,6 +133,7 @@
                                 </div>
                             </a>
                         </div>
+                        <% if(i>=10){break;} %>
                     <% } %>
                 </div>
             </div>
@@ -180,6 +164,7 @@
                             </div>
                         </a>
                     </div>
+                    <% if(i>=20){break;} %>
                 <% } %>
             </div>
         </div>
