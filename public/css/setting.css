@@ -185,7 +185,7 @@
     display: flex;
 }
 .tab_class {
-    margin-right:10px;
+    padding-right:10px;
     color: #8a8a8a;
     width: auto;
     height: 50px;
@@ -196,6 +196,9 @@
     display: block;
     float: left;
     order: -1;
+}
+.tab_class:hover {
+    background-color: #f0f0f0;
 }
 input[name="tab_name"] {
     display: none;
