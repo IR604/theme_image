@@ -287,8 +287,11 @@ app.get("/", (req, res) => {
 // ログイン・アカウント制作関係
 // ログインページ
 app.get("/login", (req, res) => {
+    var loginpath=req.query.path
+    if(loginpath==null){loginpath=''}
     res.render('login.ejs',
     {
+        path:loginpath,
         title: 'ホームページ'
     });
 });
@@ -754,7 +757,7 @@ app.get("/same_image", (req, res) => {
 // 各ユーザーがいいねしたイラスト
 app.get("/likes", (req, res) => {
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=likes');
     }else{
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
@@ -778,10 +781,10 @@ app.get("/likes", (req, res) => {
 });
 // 各ユーザーがフォローしているユーザーのテーマ・イラスト
 app.get("/follow_content", (req, res) => {
+    var type=req.query.type
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=follow_content?type='+type);
     }else{
-        var type=req.query.type
 
         var connection = mysql.createConnection(mysql_setting);
         connection.connect();
@@ -997,7 +1000,7 @@ app.get("/us:akauntolink", (req, res) => {
 // themeuploadページ
 app.get("/themeupload", (req, res) => {
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=themeupload');
     }else{
         res.render('theme_upload.ejs',
         {
@@ -1011,14 +1014,13 @@ app.get("/themeupload", (req, res) => {
 });
 // illustuploadページ
 app.get("/illustupload", (req, res) => {
+    var themeid = req.query.id
+    if(themeid==null){
+        res.redirect('/')
+    }
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=illustupload?id='+themeid);
     }else{
-        var themeid = req.query.id
-        if(themeid==null){
-            res.redirect('/')
-        }
-        
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();    
@@ -1125,7 +1127,7 @@ app.get("/research", (req, res) => {
 // 通知ページ
 app.get("/notification", (req, res) => {
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=notification')
     }else{
         var connection = mysql.createConnection(mysql_setting);
 
@@ -1294,7 +1296,7 @@ app.get("/comments", (req, res) => {
 // 設定ページ
 app.get("/setting_user", (req, res) => {
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=setting_user')
     }else{
         var connection = mysql.createConnection(mysql_setting);
 
@@ -1314,14 +1316,13 @@ app.get("/setting_user", (req, res) => {
     }
 });
 app.get("/setting_theme", (req, res) => {
+    var theme_id=req.query.id
+    if(theme_id==null){
+        res.redirect('/setting_contents')
+    }
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=setting_theme?id='+theme_id)
     }else{
-        var theme_id=req.query.id
-        if(theme_id==null){
-            res.redirect('/setting_contents')
-        }
-
         var tags=''
 
         var connection = mysql.createConnection(mysql_setting);
@@ -1355,14 +1356,12 @@ app.get("/setting_theme", (req, res) => {
     }
 });
 app.get("/setting_image", (req, res) => {
-    if(account_id==0){
-        res.redirect('/login')
+    var image_id=req.query.id
+    if(image_id==null){
+        res.redirect('/setting_contents')
+    }else if(account_id==0){
+        res.redirect('/setting_image?path=setting_image?id='+image_id)
     }else{
-        var image_id=req.query.id
-        if(image_id==null){
-            res.redirect('/setting_contents')
-        }
-
         var connection = mysql.createConnection(mysql_setting);
 
         connection.connect();
@@ -1387,14 +1386,13 @@ app.get("/setting_image", (req, res) => {
     }
 });
 app.get("/setting_list", (req, res) => {
+    var list_id=req.query.id
+    if(list_id==null){
+        res.redirect('/setting_contents')
+    }
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=setting_list?id='+list_id)
     }else{
-        var list_id=req.query.id
-        if(list_id==null){
-            res.redirect('/setting_contents')
-        }
-
         var judge
         var list_summary
 
@@ -1456,7 +1454,7 @@ app.get("/setting_list", (req, res) => {
 });
 app.get("/setting_contents", (req, res) => {
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=setting_contents')
     }else{
         var themeinfo
         var imageinfo
@@ -1492,7 +1490,7 @@ app.get("/setting_contents", (req, res) => {
 });
 app.get("/setting_password", (req, res) => {
     if(account_id==0){
-        res.redirect('/login')
+        res.redirect('/login?path=setting_password')
     }else{
         res.render('setting_password.ejs',
         {
@@ -1529,6 +1527,7 @@ app.get("/tag_cloud", (req, res)=>{
 
 // ログイン処理
 app.post('/login', (req, res) => {
+    var path = req.body.path;
     var email = req.body.email;
     var password = req.body.password;
     
@@ -1543,7 +1542,7 @@ app.post('/login', (req, res) => {
         connection.connect(); 
         connection.query('SELECT item_id from user_information where uid = ?',user.uid,function (error, results, fields){
             account_id=results[0].item_id
-            res.redirect('/');
+            res.redirect('/'+path);
         });
         connection.end();
     })
@@ -1552,7 +1551,7 @@ app.post('/login', (req, res) => {
         const errorMessage = error.message;
         console.log(errorCode);
         console.log(errorMessage);
-        res.redirect('/login');
+        res.redirect('/login?path='+path);
     });
 });
 app.post('/logout', (req, res) => {
@@ -1754,12 +1753,12 @@ app.post('/contents_insert',upload.single('file'),(req, res) => {
 
 // コメントアップロード処理
 app.post('/comment',(req, res) => {
+    var image_id = req.body.id;
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=im'+image_id);
     }else{
         var summary = req.body.comment;
         var user_id = req.body.user_id;
-        var image_id = req.body.id;
         var redirect_link = req.body.link;
         var data = {'summary':summary, 'image_id':image_id, 'account_id': account_id}
 
@@ -1791,7 +1790,7 @@ app.post('/follow',(req, res) => {
     var follow_id = req.body.id;
     var redirect_link = req.body.link;
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=us'+follow_id);
     }else if(account_id==follow_id){
         res.redirect(redirect_link);
     }
@@ -1833,10 +1832,10 @@ app.post('/deletefollow',(req, res) => {
 
 // いいね処理
 app.post('/likes',(req, res) => {
+    var contents_id = req.body.id;
     if(account_id==0){
-        res.redirect('/login');
+        res.redirect('/login?path=im'+contents_id);
     }else{
-        var contents_id = req.body.id;
         var user_id = req.body.user_id;
         var redirect_link = req.body.link;
 
