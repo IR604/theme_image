@@ -333,7 +333,7 @@ app.get("/im:imagelink", (req, res) => {
                 for(var i in results){
                     list_add+='<div class="setting_sample"><input type="radio" class="decided" name="list_id" value='+results[i].item_id+'>'+results[i].title+'</div>';
                 }
-                list_add+='<input type="submit" value="投稿"></input>'
+                list_add+='<input type="submit" class="btn btn-secondary" value="追加"></input>'
                 +'</form>'
             }
         });
@@ -504,7 +504,7 @@ app.get("/tm:themelink", (req, res) => {
                 for(var i in results){
                     list_add+='<div class="setting_sample"><input type="radio" class="decided" name="list_id" value='+results[i].item_id+'>'+results[i].title+'</div>';
                 }
-                list_add+='<input type="submit" value="投稿"></input>'
+                list_add+='<input type="submit" class="btn btn-secondary" value="追加"></input>'
                 +'</form>'
             }
         });
@@ -900,10 +900,10 @@ app.get("/us:akauntolink", (req, res) => {
                 +'</summary>'
                 +'<div class="setting_summary">'
                 +'<form action="/create_list" method="post">'
-                +'<input type="text" class="inputfield" name="title" placeholder="タイトル">'
+                +'<input type="text" class="form-control" name="title" placeholder="タイトル">'
                 +'<div class="setting_sample"><input type="radio" class="decided" name="type" value="theme" checked>テーマ</div>'
                 +'<div class="setting_sample"><input type="radio" class="decided" name="type" value="image">イラスト</div>'
-                +'<input type="submit" value="作成">'
+                +'<input type="submit" class="btn btn-secondary" value="作成">'
                 +'</form>'
                 +'</div>'
                 +'</details>'
@@ -1962,7 +1962,8 @@ app.post('/setting_image',(req, res) => {
     var connection = mysql.createConnection(mysql_setting);
 
     connection.connect();
-    var data = {'name':image_name, 'title':image_title, 'likes':0, 'contents':image_contents, 'theme_id':theme_id, 'account_id': account_id}
+    
+    var data = {'name':image_name, 'title':image_title, 'contents':image_contents, 'theme_id':theme_id}
     connection.query('update image set ? where item_id = ?', [data,image_id], function (error, results, fields){
         res.redirect('/setting_contents');
     });

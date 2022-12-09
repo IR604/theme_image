@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="stylesheet" href="css/setting.css">
 <link rel="stylesheet" href="css/common.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 </head>
 <body>
@@ -32,8 +33,8 @@
                             <%=userinfo.name%>
                         </div>
                         <b>アイコン変更</b><br>
-                        <input type="file" name="icon"  accept="image/*">
-                        <div><input type="submit" class="submit-button" value="変更"></div>
+                        <input type="file" name="icon" class="form-control" accept="image/*">
+                        <input type="submit" class="btn btn-secondary" value="変更">
                     </div>
                 </div>
             </form>
@@ -41,12 +42,12 @@
                 <input type="hidden" name="user_id" value="<%-userinfo.item_id%>">
                 <input type="hidden" name="uid" value="<%-userinfo.uid%>">
                 <h2>アカウント名変更</h2>
-                <div class="fields"><input type="text" class="inputfield" name="name" value="<%=userinfo.name%>" placeholder="新アカウント名"></div>
+                <input type="text" class="form-control" name="name" value="<%=userinfo.name%>" placeholder="新アカウント名">
                 <h2>概要欄変更</h2>
-                <textarea name="summary" class="setting-summary" placeholder="概要"><%=userinfo.summary%></textarea>
+                <textarea name="summary" class="setting-summary form-control" placeholder="概要"><%=userinfo.summary%></textarea>
                 <h2>ヘッダ画像変更</h2>
-                <input type="file" name="header"  accept="image/*">
-                <div class="setting_submit"><input type="submit" class="submit-button" value="更新"></div>
+                <input type="file" name="header" class="form-control" accept="image/*">
+                <div class="setting_submit"><input type="submit" class="btn btn-secondary" value="更新"></div>
             </form>
         </div>
     </div>
