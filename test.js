@@ -1,12 +1,7 @@
 var mysql = require('mysql');
 const fs = require('fs');
 
-var mysql_setting = {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ir604'
-};
+const mysql_setting = require("./mysql_setting.json");;
 
 function add_user(loop){
      for(var i=0;i<loop;i++){
@@ -329,7 +324,5 @@ function all(id){
       
      connection.end();
 }
-public_user(0)
-public_user(1)
-public_user(2)
+add_image(1, 1, 10)
 all('tags')

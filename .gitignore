@@ -1,2 +1,4 @@
 serviceAccountKey.json
+firebaseConfig.json
+mysql_setting.json
 node_modules

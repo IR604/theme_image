@@ -52,12 +52,7 @@ var mysql = require('mysql');
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
-var mysql_setting = {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ir604'
-};
+const mysql_setting = require("./mysql_setting.json");
 
 var { check, validationResult } = require('express-validator');
 
@@ -68,9 +63,7 @@ const firebase_auth = require('firebase/auth');
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-};
-
+const firebaseConfig = require("./firebaseConfig.json");
 firebase.initializeApp(firebaseConfig);
 
 // 関数
